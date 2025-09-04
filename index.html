@@ -1,63 +1,57 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Feliz Aniversário, Helena!</title>
-  <style>
-    :root{
-      --accent:#FF3D84;
-      --bg:linear-gradient(180deg,#87CEFA 0%, #FFFAF0 62%);
-      --shadow:0 8px 24px rgba(0,0,0,.12);
-    }
-    html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;background:var(--bg);}
-    #stage{position:relative;width:100vw;height:100vh;overflow:hidden;touch-action:none}
-
-    /* Clouds */
-    .clouds{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden}
-    .cloud{position:absolute;left:-35%;width:380px;height:120px;background:linear-gradient(180deg,#fff,#f6fbff);border-radius:60px;box-shadow:0 10px 30px rgba(20,60,120,.06);opacity:.95}
-    .cloud.small{width:230px;height:84px;border-radius:50px;opacity:.92}
-    @keyframes drift{from{transform:translateX(-40vw)}to{transform:translateX(120vw)}}
-
-    /* HUD */
-    .hud{position:absolute;left:18px;top:12px;z-index:60;color:#033;font-weight:800;text-shadow:0 1px 0 #fff}
-    .controls{position:absolute;right:16px;top:10px;z-index:60;display:flex;gap:8px;flex-wrap:wrap;max-width:90vw}
-    .btn{background:rgba(255,255,255,.96);backdrop-filter:saturate(140%) blur(6px);border-radius:12px;padding:8px 12px;box-shadow:var(--shadow);cursor:pointer;font-weight:800;border:0;white-space:nowrap}
-
-    /* Score */
-    .score{position:absolute;left:16px;bottom:16px;z-index:60;background:rgba(255,255,255,.92);padding:8px 12px;border-radius:12px;font-weight:900;box-shadow:var(--shadow)}
-
-    /* Present */
-    .present{position:absolute;right:16px;bottom:calc(18px + env(safe-area-inset-bottom));font-size:64px;z-index:50;cursor:pointer;user-select:none}
-
-    /* Cake */
-    #cake{position:absolute;left:50%;bottom:10%;transform:translate(-50%,200%) scale(.95);z-index:55;transition:transform 700ms cubic-bezier(.2,.9,.3,1);display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
-    #cake .bigcake{font-size:84px}
-    #cake .hint{font-size:14px;color:#123}
-    #cake .label{font-weight:800;color:var(--accent);font-size:14px;padding:6px 10px;background:rgba(255,255,255,.92);border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,.06)}
-
-    /* Message */
-    #message{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);font-size:56px;font-weight:900;color:var(--accent);text-shadow:2px 6px 12px rgba(0,0,0,.18);opacity:0;z-index:70;pointer-events:none;text-align:center;padding:8px;max-width:90%}
-
-    /* Balloons */
-    .balloon{position:absolute;font-size:48px;z-index:40;cursor:pointer;user-select:none;touch-action:none}
-
-    /* Floating unlock copy */
-    @keyframes riseUp { 0%{ transform:translateY(0) rotate(0deg); opacity:1 } 100%{ transform:translateY(-120vh) rotate(30deg); opacity:0 } }
-    .floating-unlock{ position:absolute; font-size:56px; z-index:45; pointer-events:none; animation: riseUp 6s linear forwards }
-
-    /* Responsive */
-    @media (max-width:900px){ .btn{padding:6px 10px;border-radius:10px} #message{top:40%} }
-    @media (max-width:600px){ #message{font-size:34px;top:36%} #cake .bigcake{font-size:64px} .present{font-size:56px} }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Feliz Aniversário, Helena!</title>
+<style>
+  :root{
+    --accent:#FF3D84;
+    --bg:linear-gradient(180deg,#87CEFA 0%, #FFFAF0 62%);
+    --card: rgba(255,255,255,.95);
+    --shadow: 0 8px 24px rgba(0,0,0,.12);
+  }
+  html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, 'Helvetica Neue', Arial,sans-serif;background:var(--bg);-webkit-font-smoothing:antialiased}
+  #stage{position:relative;width:100vw;height:100vh;overflow:hidden;touch-action:none;padding-top:48px} /* padding top to avoid HUD overlap */
+  /* Clouds */
+  .clouds{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden}
+  .cloud{position:absolute;left:-35%;width:380px;height:120px;background:linear-gradient(180deg,#fff,#f6fbff);border-radius:60px;box-shadow:0 10px 30px rgba(20,60,120,.06);opacity:.95}
+  .cloud.small{width:230px;height:84px;border-radius:50px;opacity:.92}
+  @keyframes drift{from{transform:translateX(-40vw)}to{transform:translateX(120vw)}}
+  /* Top HUD */
+  .hud{position:fixed;left:14px;top:8px;z-index:120;color:#033;font-weight:800;text-shadow:0 1px 0 #fff;background:transparent;padding:6px}
+  .controls{position:fixed;right:8px;top:8px;z-index:130;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .btn{background:var(--card);border-radius:12px;padding:8px 10px;box-shadow:var(--shadow);cursor:pointer;font-weight:800;border:0;font-size:14px}
+  /* Score & game UI */
+  .score{position:fixed;left:14px;bottom:14px;z-index:120;background:var(--card);padding:8px 12px;border-radius:12px;font-weight:900;box-shadow:var(--shadow)}
+  .gameScore{position:fixed;left:50%;transform:translateX(-50%);top:56px;z-index:125;background:linear-gradient(90deg,#fff8fb,#ffffff);padding:10px 16px;border-radius:18px;font-weight:900;box-shadow:var(--shadow);display:none}
+  /* Present & cake */
+  .present{position:fixed;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));font-size:56px;z-index:120;cursor:pointer;user-select:none;background:var(--card);border-radius:10px;padding:6px;box-shadow:var(--shadow)}
+  #cake{position:absolute;left:50%;bottom:10%;transform:translate(-50%,200%) scale(.95);z-index:55;transition:transform .7s cubic-bezier(.2,.9,.3,1);display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
+  #cake .bigcake{font-size:84px}
+  #cake .hint{font-size:14px;color:#123}
+  #cake .label{font-weight:800;color:var(--accent);font-size:14px;padding:6px 10px;background:var(--card);border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,.06)}
+  /* central message */
+  #message{position:absolute;left:50%;top:36%;transform:translate(-50%,-50%);font-size:48px;font-weight:900;color:var(--accent);text-shadow:2px 6px 12px rgba(0,0,0,.18);opacity:0;z-index:115;pointer-events:none;text-align:center;padding:8px;max-width:90%}
+  /* Balloons */
+  .balloon{position:absolute;font-size:48px;z-index:100;cursor:pointer;user-select:none;touch-action:none}
+  /* floating unlock (visual) */
+  @keyframes riseUp {0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(-140vh) rotate(30deg);opacity:0}}
+  .floating-unlock{position:absolute;font-size:56px;z-index:105;pointer-events:none;animation:riseUp 6s linear forwards}
+  /* mascot celebration */
+  .mascot{position:fixed;left:50%;transform:translateX(-50%);top:20%;z-index:140;font-size:84px;opacity:0;transition:all .45s;pointer-events:none;text-shadow:0 6px 18px rgba(0,0,0,.15)}
+  .mascot.show{opacity:1;transform:translateX(-50%) translateY(-6px) scale(1.05);animation:bounce .9s ease-in-out}
+  @keyframes bounce{0%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-12px)}100%{transform:translateX(-50%) translateY(0)}}
+  /* responsive tweaks */
+  @media (max-width:600px){ #message{font-size:30px;top:34%} .btn{font-size:13px;padding:6px 8px} .present{font-size:52px} .mascot{font-size:64px} }
+</style>
 </head>
 <body>
-  <div id="stage" role="application" aria-label="Surpresa de aniversário interativa para criança">
+  <div id="stage" role="application" aria-label="Surpresa de aniversário interativa">
     <div class="clouds" id="clouds" aria-hidden="true"></div>
 
     <div class="hud">Surpresa de Aniversário 🎉</div>
     <div class="controls">
-      <button id="bgmBtn" class="btn" aria-pressed="false">▶ Música</button>
       <button id="fxBtn" class="btn" aria-pressed="true">🔊 Efeitos: ON</button>
       <button id="gameModeBtn" class="btn">🎮 Modo Jogo</button>
       <button id="restartBtn" class="btn">↻ Reiniciar</button>
@@ -66,129 +60,330 @@
     <button id="present" class="present" aria-label="Abrir presente">🎁</button>
 
     <div id="cake" aria-hidden="true">
-      <div class="bigcake" aria-hidden="true">🎂</div>
+      <div class="bigcake">🎂</div>
       <div class="hint">Toque no bolo para soprar as velinhas</div>
       <div class="label">Bolo Surpresa</div>
     </div>
 
     <div id="message" role="status" aria-live="polite">FELIZ ANIVERSÁRIO, HELENA!!</div>
 
+    <div class="gameScore" id="gameScore">Estourados: <span id="poppedCount">0</span></div>
     <div class="score" id="scoreBox">Pontos: <span id="score">0</span></div>
+
+    <div class="mascot" id="mascot">🦄</div>
 
     <canvas id="fxCanvas" aria-hidden="true"></canvas>
   </div>
 
-  <script>
-    // ================= CONFIG =================
-    const CHILD_NAME = 'HELENA';
-    const UNLOCKS = [
-      {score:5,  key:'unicorn', emoji:'🦄', label:'Unicórnio'},
-      {score:12, key:'bear',    emoji:'🧸', label:'Ursinho'},
-      {score:20, key:'cat',     emoji:'🐱', label:'Gatinho'}
-    ];
-    document.getElementById('message').textContent = `FELIZ ANIVERSÁRIO, ${CHILD_NAME}!!`;
+<script>
+  // ====== Config & Elements ======
+  const CHILD_NAME = 'HELENA';
+  const UNLOCKS = [
+    {score:5,  key:'unicorn', emoji:'🦄', label:'Unicórnio'},
+    {score:12, key:'bear',    emoji:'🧸', label:'Ursinho'},
+    {score:20, key:'cat',     emoji:'🐱', label:'Gatinho'}
+  ];
+  document.getElementById('message').textContent = `FELIZ ANIVERSÁRIO, ${CHILD_NAME}!!`;
 
-    // ================= STATE & ELEMENTS =================
-    const stage = document.getElementById('stage');
-    const cloudsRoot = document.getElementById('clouds');
-    const present = document.getElementById('present');
-    const cake = document.getElementById('cake');
-    const cakeLabel = cake.querySelector('.label');
-    const messageEl = document.getElementById('message');
-    const scoreEl = document.getElementById('score');
-    const fxCanvas = document.getElementById('fxCanvas');
-    const ctx = fxCanvas.getContext('2d');
-    const bgmBtn = document.getElementById('bgmBtn');
-    const fxBtn = document.getElementById('fxBtn');
-    const restartBtn = document.getElementById('restartBtn');
-    const gameModeBtn = document.getElementById('gameModeBtn');
+  const stage = document.getElementById('stage');
+  const cloudsRoot = document.getElementById('clouds');
+  const present = document.getElementById('present');
+  const cake = document.getElementById('cake');
+  const cakeLabel = cake.querySelector('.label');
+  const messageEl = document.getElementById('message');
+  const scoreEl = document.getElementById('score');
+  const poppedCountEl = document.getElementById('poppedCount');
+  const gameScoreEl = document.getElementById('gameScore');
+  const fxCanvas = document.getElementById('fxCanvas');
+  const ctx = fxCanvas.getContext('2d');
+  const fxBtn = document.getElementById('fxBtn');
+  const restartBtn = document.getElementById('restartBtn');
+  const gameModeBtn = document.getElementById('gameModeBtn');
+  const mascot = document.getElementById('mascot');
 
-    let score = 0; let unlocked = new Set();
-    let gameMode=false; let spawnRate = 900; let lastSpawn=0;
-    let particles = []; let balloons = [];
-    let melodyInterval = null; let audioCtx = null; let musicOn=false; let fxOn=true;
+  // ====== State ======
+  let score = 0, poppedCount = 0;
+  let unlocked = new Set();
+  let balloons = [], particles = [];
+  let audioCtx = null, fxOn = true;
+  let gameMode = false;
+  // difficulty tuning (kid-friendly)
+  let SPAWN_RATE = 1200; // ms - base spawn interval (normal)
+  let MAX_BALLOONS = 8;  // limit to avoid overload for 3yo
+  let lastSpawn = 0;
 
-    // ================= CANVAS SIZE =================
-    function resizeCanvas(){ const dpr = Math.max(1, window.devicePixelRatio || 1); fxCanvas.width = Math.round(window.innerWidth * dpr); fxCanvas.height = Math.round(window.innerHeight * dpr); fxCanvas.style.width = window.innerWidth + 'px'; fxCanvas.style.height = window.innerHeight + 'px'; ctx.setTransform(dpr,0,0,dpr,0,0); }
-    window.addEventListener('resize', resizeCanvas); resizeCanvas();
+  // ====== Canvas sizing ======
+  function resizeCanvas(){
+    const dpr = Math.max(1, window.devicePixelRatio || 1);
+    fxCanvas.width = Math.round(window.innerWidth * dpr);
+    fxCanvas.height = Math.round(window.innerHeight * dpr);
+    fxCanvas.style.width = window.innerWidth + 'px';
+    fxCanvas.style.height = window.innerHeight + 'px';
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
 
-    // ================= CLOUDS =================
-    function createCloud(topPx,size='large',delay=0,duration=50,leftOffset=-30){ const c=document.createElement('div'); c.className='cloud' + (size==='small'?' small':''); c.style.top = topPx+'px'; c.style.left = leftOffset + '%'; c.style.animation = `drift ${duration}s linear ${delay}s infinite`; cloudsRoot.appendChild(c); }
-    createCloud(40,'large',0,55,-40); createCloud(120,'small',6,40,-60); createCloud(200,'large',12,70,-20); createCloud(300,'small',3,45,-50);
+  // ====== Clouds ======
+  function createCloud(topPx,size='large',delay=0,duration=50,leftOffset=-30){
+    const c = document.createElement('div');
+    c.className = 'cloud' + (size==='small' ? ' small' : '');
+    c.style.top = topPx + 'px';
+    c.style.left = leftOffset + '%';
+    c.style.animation = `drift ${duration}s linear ${delay}s infinite`;
+    cloudsRoot.appendChild(c);
+  }
+  createCloud(40,'large',0,55,-40);
+  createCloud(120,'small',6,40,-60);
+  createCloud(200,'large',12,70,-20);
+  createCloud(300,'small',3,45,-50);
 
-    // ================= AUDIO =================
-    function initAudio(){ if(audioCtx) return; try{ audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }catch(e){ console.warn('Audio não disponível',e); audioCtx = null; } }
-    function playTone(freq, duration=220, volume=0.025, type='sine', tOffset=0){ if(!audioCtx || !fxOn) return; try{ const t = (audioCtx.currentTime + tOffset/1000); const o = audioCtx.createOscillator(); const g = audioCtx.createGain(); o.type=type; o.frequency.setValueAtTime(freq, t); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(volume, t+0.02); o.connect(g); g.connect(audioCtx.destination); o.start(t); o.stop(t + duration/1000 + .02);}catch(e){} }
-    function chime(kind='default'){
-      if(!audioCtx || !fxOn) return;
-      if(kind==='default'){ playTone(880,120,0.03,'triangle'); }
-      else if(kind==='unicorn'){ playTone(660,160,0.025,'sine'); playTone(990,180,0.022,'sine',120); playTone(1320,200,0.02,'sine',260); }
-      else if(kind==='bear'){ playTone(330,160,0.035,'square'); playTone(247,220,0.03,'sine',120); }
-      else if(kind==='cat'){ playTone(1046,100,0.02,'triangle'); playTone(1318,100,0.02,'triangle',90); }
+  // ====== Audio (effects only) ======
+  function initAudio(){ if(audioCtx) return; try{ audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }catch(e){ audioCtx = null; console.warn('Audio não disponível'); } }
+  function playTone(freq, duration=200, volume=0.03, type='sine', tOffset=0){
+    if(!audioCtx || !fxOn) return;
+    try{
+      const t = audioCtx.currentTime + tOffset/1000;
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      o.type = type;
+      o.frequency.setValueAtTime(freq, t);
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(volume, t + 0.02);
+      o.connect(g); g.connect(audioCtx.destination);
+      o.start(t); o.stop(t + duration/1000 + 0.02);
+    }catch(e){}
+  }
+  function chime(kind='default'){
+    if(!audioCtx || !fxOn) return;
+    if(kind==='default'){ playTone(880,100,0.03,'triangle'); }
+    else if(kind==='unicorn'){ playTone(880,120,0.03,'sine'); playTone(1200,140,0.02,'sine',90); playTone(1500,160,0.015,'sine',200); }
+    else if(kind==='bear'){ playTone(330,160,0.04,'square'); playTone(260,160,0.03,'sine',100); }
+    else if(kind==='cat'){ playTone(1200,90,0.02,'triangle'); playTone(1500,90,0.02,'triangle',80); }
+    else if(kind==='milestone'){ playTone(660,150,0.03,'sine'); playTone(880,160,0.025,'sine',100); }
+  }
+
+  // unlock visuals: floating copy that rises like balloon
+  function spawnFloatingUnlockVisual(emoji){
+    const el = document.createElement('div'); el.className = 'floating-unlock'; el.textContent = emoji;
+    const startX = window.innerWidth/2 + (Math.random()-0.5)*160;
+    const startY = window.innerHeight*0.65 + (Math.random()-0.5)*40;
+    el.style.left = startX + 'px'; el.style.top = startY + 'px';
+    stage.appendChild(el);
+    el.addEventListener('animationend', ()=>el.remove());
+  }
+
+  // ====== Balloons ======
+  function spawnBalloon(type='normal'){
+    if(balloons.length >= MAX_BALLOONS) return;
+    const el = document.createElement('div'); el.className = 'balloon';
+    let emoji='🎈', kind='default', points=1;
+    if(type==='unicorn'){ emoji='🦄'; kind='unicorn'; points=3; }
+    if(type==='bear'){ emoji='🧸'; kind='bear'; points=2; }
+    if(type==='cat'){ emoji='🐱'; kind='cat'; points=2; }
+    el.textContent = emoji; el.setAttribute('role','button');
+    const x = Math.random() * (window.innerWidth - 80) + 40;
+    const y = window.innerHeight + 80;
+    el.style.left = x + 'px'; el.style.top = y + 'px';
+    stage.appendChild(el);
+    const b = {x,y,vy:0.9 + Math.random()*1.4,el,sway:Math.random()*0.7,popped:false, kind, points};
+    el.addEventListener('pointerdown', (ev)=>{
+      ev.stopPropagation();
+      if(b.popped) return;
+      b.popped = true;
+      popBalloon(b);
+    });
+    balloons.push(b);
+  }
+
+  function popBalloon(b){
+    if(!b.el) return;
+    b.el.textContent = '✨';
+    b.el.style.transform = 'scale(1.1) rotate(6deg)';
+    chime(b.kind || 'default');
+    incrementScore(b.points);
+    poppedCount++;
+    poppedCountEl.textContent = poppedCount;
+    // special particle pool by kind
+    const pool = (b.kind==='unicorn')?['✨','💖','🌈']: (b.kind==='bear')?['💖','🧸','✨']: (b.kind==='cat')?['✨','🐾','💖'] : ['✨','💖','🌟'];
+    for(let i=0;i<8;i++) spawnParticleEmoji(b.x + (Math.random()-0.5)*30, b.y - 30 + (Math.random()-0.5)*20, pool[Math.floor(Math.random()*pool.length)]);
+    setTimeout(()=>{ try{ b.el.remove(); }catch(e){} }, 260);
+
+    // milestone: every 5 pops show mascot + confetti + small chime (kid-friendly)
+    if(poppedCount % 5 === 0){
+      showMascotCelebration();
+      chime('milestone');
+      spawnConfetti(window.innerWidth/2, window.innerHeight/2, 40);
+      // increase difficulty gently but cap
+      if(SPAWN_RATE > 400) SPAWN_RATE = Math.max(400, SPAWN_RATE - 80); // faster spawn
+      if(MAX_BALLOONS < 16) MAX_BALLOONS += 1;
     }
-    function startMelody(){ if(!audioCtx || melodyInterval) return; const seq=[440,660,880,660]; let i=0; melodyInterval = setInterval(()=>{ if(musicOn) playTone(seq[i%seq.length],240,0.012,'sine'); i++; },360); }
-    function stopMelody(){ if(melodyInterval){ clearInterval(melodyInterval); melodyInterval=null; } }
+  }
 
-    bgmBtn.addEventListener('click',()=>{ if(!audioCtx) initAudio(); if(!audioCtx) return; if(audioCtx.state==='suspended'){ audioCtx.resume().catch(()=>{});} musicOn=!musicOn; bgmBtn.textContent = musicOn ? '⏸ Música' : '▶ Música'; if(musicOn) startMelody(); else stopMelody(); });
-    fxBtn.addEventListener('click',()=>{ fxOn=!fxOn; fxBtn.textContent = fxOn ? '🔊 Efeitos: ON' : '🔇 Efeitos: OFF'; fxBtn.setAttribute('aria-pressed', fxOn ? 'true' : 'false'); });
-    stage.addEventListener('pointerdown', ()=>{ if(!audioCtx){ initAudio(); } if(audioCtx && audioCtx.state==='suspended'){ audioCtx.resume().catch(()=>{}); } }, {once:true,passive:true});
-
-    // ================= BALLOONS =================
-    const MAX_BALLOONS = 22;
-    function spawnBalloon(type='normal'){ if(balloons.length >= MAX_BALLOONS) return; const el=document.createElement('div'); el.className='balloon'; let emoji='🎈', popKind='default', points=1; if(type==='unicorn'){emoji='🦄'; popKind='unicorn'; points=3;} if(type==='bear'){emoji='🧸'; popKind='bear'; points=2;} if(type==='cat'){emoji='🐱'; popKind='cat'; points=2;} el.textContent=emoji; el.setAttribute('role','button'); const x = Math.random() * (window.innerWidth - 80) + 40; const y = window.innerHeight + 80; el.style.left=x+'px'; el.style.top=y+'px'; stage.appendChild(el); const b={x,y,vy:1.0+Math.random()*1.8,el,sway:Math.random()*0.6,popped:false,type,popKind,points}; el.addEventListener('pointerdown',(ev)=>{ev.stopPropagation(); if(b.popped) return; b.popped=true; popBalloon(b);}); balloons.push(b); }
-
-    function popBalloon(b){ if(!b.el) return; b.el.textContent='✨'; b.el.style.transform='scale(1.15) rotate(6deg)'; chime(b.popKind); incrementScore(b.points); const emPool = (b.type==='unicorn')?['✨','💖','🌈']: (b.type==='bear')?['💖','✨','🧸'] : (b.type==='cat')?['✨','🐾','💖'] : ['✨','💖','🌟']; for(let i=0;i<8;i++) spawnParticleEmoji(b.x + (Math.random()-.5)*30, b.y - 30 + (Math.random()-.5)*20, emPool[Math.floor(Math.random()*emPool.length)]); setTimeout(()=>{ try{ b.el.remove(); }catch(e){} }, 280); }
-
-    // ================= PARTICLES =================
-    function spawnParticleEmoji(x,y,emoji){ particles.push({x,y,vx:(Math.random()-0.5)*6, vy:(-1 - Math.random()*3), life:800 + Math.random()*600, born:performance.now(), emoji, size:12+Math.random()*18, gravity:0.06}); }
-    function spawnConfetti(x,y,qty=40){ const colors=['#FF4DA6','#FFD166','#8AE6C1','#9CB4FF','#FFD1DC']; for(let i=0;i<qty;i++){ particles.push({x,y,vx:(Math.random()-0.5)*8, vy:(-2 - Math.random()*6), life:900 + Math.random()*600, born:performance.now(), color: colors[Math.floor(Math.random()*colors.length)], w:6+Math.random()*10, h:10+Math.random()*20, gravity:0.06, rot: Math.random()*360}); } }
-    function launchFirework(x,y){ const cnt=30+Math.floor(Math.random()*40); for(let i=0;i<cnt;i++){ const ang=Math.random()*Math.PI*2; const speed=0.5 + Math.random()*6; particles.push({x,y,vx:Math.cos(ang)*speed, vy:Math.sin(ang)*speed -2, life:900+Math.random()*800, born:performance.now(), emoji:['❤️','💖','✨'][Math.floor(Math.random()*3)], size:10+Math.random()*28, gravity:0.04}); } }
-
-    // ================= UNLOCKS =================
-    function maybeSpawnSpecialRandom(){ // pequena chance de especiais mesmo sem desbloqueio
-      const r = Math.random();
-      if(r < 0.02) return spawnBalloon('unicorn');
-      if(r < 0.035) return spawnBalloon('bear');
-      if(r < 0.05) return spawnBalloon('cat');
+  // ====== Particles & confetti ======
+  function spawnParticleEmoji(x,y,emoji){
+    particles.push({x,y,vx:(Math.random()-0.5)*6, vy:(-1 - Math.random()*3), life:700 + Math.random()*600, born:performance.now(), emoji, size:12+Math.random()*18, gravity:0.06});
+  }
+  function spawnConfetti(x,y,qty=40){
+    const colors=['#FF4DA6','#FFD166','#8AE6C1','#9CB4FF','#FFD1DC'];
+    for(let i=0;i<qty;i++){
+      particles.push({x,y,vx:(Math.random()-0.5)*8, vy:(-2 - Math.random()*6), life:900 + Math.random()*600, born:performance.now(), color: colors[Math.floor(Math.random()*colors.length)], w:6+Math.random()*10, h:10+Math.random()*20, gravity:0.06, rot: Math.random()*360});
     }
-    function onUnlock(u){ // garantia: ao desbloquear, spawna um especial
-      spawnBalloon(u.key);
-      const el=document.createElement('div'); el.className='floating-unlock'; el.textContent=u.emoji; const startX=window.innerWidth/2 + (Math.random()-0.5)*160; const startY=window.innerHeight*0.65 + (Math.random()-0.5)*40; el.style.left=startX+'px'; el.style.top=startY+'px'; stage.appendChild(el); el.addEventListener('animationend',()=>el.remove());
-    }
-    function checkUnlocks(){ for(const u of UNLOCKS){ if(score >= u.score && !unlocked.has(u.key)){ unlocked.add(u.key); onUnlock(u);} } }
+  }
+  function launchFirework(x,y){ const cnt=30+Math.floor(Math.random()*30); for(let i=0;i<cnt;i++){ const ang=Math.random()*Math.PI*2; const speed=0.5 + Math.random()*6; particles.push({x,y,vx:Math.cos(ang)*speed, vy:Math.sin(ang)*speed -2, life:900+Math.random()*600, born:performance.now(), emoji:['❤️','💖','✨'][Math.floor(Math.random()*3)], size:10+Math.random()*28, gravity:0.04}); } }
 
-    // ================= SCORE =================
-    function incrementScore(n){ score += n; scoreEl.textContent = score; checkUnlocks(); }
-
-    // ================= MAIN LOOP =================
-    let lastFrame = performance.now();
-    function animate(now){ const dt = now - lastFrame; lastFrame = now; if(now - lastSpawn > (gameMode ? spawnRate/ (1 + Math.min(3, score/10)) : spawnRate)){ // chance especial
-        if(Math.random() < 0.05) { maybeSpawnSpecialRandom(); } else { spawnBalloon('normal'); }
-        lastSpawn = now;
+  // ====== Unlock system ======
+  function checkUnlocks(){
+    for(const u of UNLOCKS){
+      if(score >= u.score && !unlocked.has(u.key)){
+        unlocked.add(u.key);
+        // spawn one special balloon and floating visual
+        spawnBalloon(u.key);
+        spawnFloatingUnlockVisual(u.emoji);
       }
-      // update balloons
-      for(let i=balloons.length-1;i>=0;i--){ const b=balloons[i]; if(b.popped){ balloons.splice(i,1); continue; } b.y -= b.vy * (dt/16); const sway = Math.sin((now/600) + b.sway*10) * 18; b.x += (sway * 0.0009) * (dt/16); if(b.el){ b.el.style.top=b.y+'px'; b.el.style.left=b.x+'px'; } if(b.y < -120){ try{ b.el.remove(); }catch(e){} balloons.splice(i,1); } }
-      // particles draw
-      ctx.clearRect(0,0,fxCanvas.width,fxCanvas.height);
-      const keep=[]; for(const p of particles){ const age = now - p.born; if(age > p.life) continue; p.vy += (p.gravity || 0.04) * (dt/16); p.x += p.vx * (dt/16); p.y += p.vy * (dt/16); const alpha=Math.max(0,1-(age/p.life)); ctx.globalAlpha=alpha; if(p.emoji){ ctx.font=(p.size||18)+'px serif'; ctx.fillText(p.emoji,p.x,p.y); } else { ctx.save(); ctx.translate(p.x,p.y); ctx.rotate((p.rot||0) * Math.PI/180 * (age/500)); ctx.fillStyle=p.color||'#fff'; ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h); ctx.restore(); } ctx.globalAlpha=1; keep.push(p);} particles.length=0; particles.push(...keep);
-      requestAnimationFrame(animate);
     }
+  }
+
+  // ====== Score handling & display ======
+  function incrementScore(n){
+    score += n; scoreEl.textContent = score;
+    checkUnlocks();
+  }
+
+  // ====== Mascot celebration (keeps attention) ======
+  function showMascotCelebration(){
+    mascot.classList.add('show');
+    setTimeout(()=>mascot.classList.remove('show'), 1200);
+  }
+
+  // ====== Random special chance (keeps surprise) ======
+  function maybeSpawnSpecialRandom(){
+    const r = Math.random();
+    if(r < 0.015) spawnBalloon('unicorn');
+    else if(r < 0.03) spawnBalloon('bear');
+    else if(r < 0.05) spawnBalloon('cat');
+  }
+
+  // ====== Animation loop ======
+  let lastFrame = performance.now();
+  function animate(now){
+    const dt = now - lastFrame; lastFrame = now;
+    // spawn logic
+    if(now - lastSpawn > SPAWN_RATE){
+      if(Math.random() < 0.06) maybeSpawnSpecialRandom();
+      else spawnBalloon('normal');
+      lastSpawn = now;
+    }
+    // update balloons
+    for(let i=balloons.length-1;i>=0;i--){
+      const b = balloons[i];
+      if(b.popped){ balloons.splice(i,1); continue; }
+      b.y -= b.vy * (dt/16);
+      const sway = Math.sin((now/600) + b.sway*10) * 18;
+      b.x += (sway * 0.0009) * (dt/16);
+      if(b.el){ b.el.style.top = b.y + 'px'; b.el.style.left = b.x + 'px'; }
+      if(b.y < -140){ try{ b.el.remove(); }catch(e){} balloons.splice(i,1); }
+    }
+    // draw particles
+    ctx.clearRect(0,0,fxCanvas.width,fxCanvas.height);
+    const keep = [];
+    for(const p of particles){
+      const age = now - p.born;
+      if(age > p.life) continue;
+      p.vy += (p.gravity || 0.04) * (dt/16);
+      p.x += p.vx * (dt/16);
+      p.y += p.vy * (dt/16);
+      const alpha = Math.max(0, 1 - (age / p.life));
+      ctx.globalAlpha = alpha;
+      if(p.emoji){
+        ctx.font = (p.size || 18) + 'px serif';
+        ctx.fillText(p.emoji, p.x, p.y);
+      } else {
+        ctx.save(); ctx.translate(p.x,p.y); ctx.rotate((p.rot||0) * Math.PI/180 * (age/500));
+        ctx.fillStyle = p.color || '#fff'; ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h); ctx.restore();
+      }
+      ctx.globalAlpha = 1;
+      keep.push(p);
+    }
+    particles.length = 0; particles.push(...keep);
     requestAnimationFrame(animate);
+  }
+  requestAnimationFrame(animate);
 
-    // ================= PRESENT & CAKE =================
-    let cakeVisible=false; let cakeMessageStage=0; present.addEventListener('click',(ev)=>{ ev.stopPropagation(); if(!audioCtx) initAudio(); chime('default'); if(cakeVisible) return; cakeVisible=true; cake.style.transform='translate(-50%,0%) scale(1)'; cake.setAttribute('aria-hidden','false'); spawnConfetti(window.innerWidth/2, window.innerHeight/2, 32); });
-    cake.addEventListener('click',(ev)=>{ ev.stopPropagation(); if(!cakeVisible) return; chime('default'); cakeLabel.style.opacity = 0; if(cakeMessageStage===0){ messageEl.textContent=`FELIZ ANIVERSÁRIO, ${CHILD_NAME}!!`; messageEl.style.opacity=1; cakeMessageStage=1; for(let i=0;i<6;i++){ setTimeout(()=>{ launchFirework((window.innerWidth*(0.25+Math.random()*0.5)), (window.innerHeight*(0.2+Math.random()*0.2))); }, i*420); } spawnConfetti(window.innerWidth/2, window.innerHeight/2, 80); } else if(cakeMessageStage===1){ messageEl.textContent='A dinda Thami e o dindo Gabi amam muito você!'; messageEl.style.opacity=1; cakeMessageStage=2; for(let i=0;i<12;i++){ setTimeout(()=>spawnParticleEmoji(window.innerWidth/2 + (Math.random()-0.5)*120, window.innerHeight/2 + (Math.random()-0.5)*80, '💖'), i*80); } } else { chime('default'); spawnConfetti(window.innerWidth/2, window.innerHeight/2, 18); } });
+  // ====== Present & Cake interactions ======
+  let cakeVisible=false, cakeMessageStage=0;
+  present.addEventListener('click',(ev)=>{ ev.stopPropagation(); if(!audioCtx) initAudio(); chime('default'); if(cakeVisible) return; cakeVisible=true; cake.style.transform='translate(-50%,0%) scale(1)'; cake.setAttribute('aria-hidden','false'); spawnConfetti(window.innerWidth/2, window.innerHeight/2, 32); });
+  cake.addEventListener('click',(ev)=>{ ev.stopPropagation(); if(!cakeVisible) return; if(!audioCtx) initAudio(); chime('default'); cakeLabel.style.opacity = 0;
+    if(cakeMessageStage===0){
+      messageEl.textContent = `FELIZ ANIVERSÁRIO, ${CHILD_NAME}!!`; messageEl.style.opacity = 1; cakeMessageStage=1;
+      for(let i=0;i<6;i++) setTimeout(()=>launchFirework((window.innerWidth*(0.25+Math.random()*0.5)), (window.innerHeight*(0.2+Math.random()*0.2))), i*420);
+      spawnConfetti(window.innerWidth/2, window.innerHeight/2, 80);
+    } else if(cakeMessageStage===1){
+      messageEl.textContent = `A dinda Thami e o dindo Gabi amam muito você!`; messageEl.style.opacity = 1; cakeMessageStage=2;
+      for(let i=0;i<12;i++) setTimeout(()=>spawnParticleEmoji(window.innerWidth/2 + (Math.random()-0.5)*120, window.innerHeight/2 + (Math.random()-0.5)*80, '💖'), i*80);
+    } else {
+      chime('default');
+      spawnConfetti(window.innerWidth/2, window.innerHeight/2, 18);
+    }
+  });
 
-    // ================= CONTROLS =================
-    gameModeBtn.addEventListener('click', ()=>{ gameMode=!gameMode; gameModeBtn.textContent = gameMode ? '🏆 Modo Jogo: ON' : '🎮 Modo Jogo'; chime('default'); });
-    function restart(){ for(const b of Array.from(balloons)){ try{ b.el.remove(); }catch(e){} } balloons.length=0; particles.length=0; for(const f of Array.from(document.querySelectorAll('.floating-unlock'))){ try{ f.remove(); }catch(e){} } unlocked.clear(); score=0; scoreEl.textContent=0; messageEl.style.opacity=0; cakeVisible=false; cakeMessageStage=0; cake.style.transform='translate(-50%,200%) scale(.95)'; stopMelody(); musicOn=false; bgmBtn.textContent='▶ Música'; fxOn=true; fxBtn.textContent='🔊 Efeitos: ON'; fxBtn.setAttribute('aria-pressed','true'); }
-    restartBtn.addEventListener('click', ()=>{ chime('default'); restart(); });
+  // ====== Controls: FX, Game Mode, Restart ======
+  fxBtn.addEventListener('click', ()=>{
+    fxOn = !fxOn;
+    fxBtn.textContent = fxOn ? '🔊 Efeitos: ON' : '🔇 Efeitos: OFF';
+    fxBtn.setAttribute('aria-pressed', fxOn ? 'true' : 'false');
+    if(!audioCtx) initAudio();
+  });
 
-    // Shortcuts
-    window.addEventListener('keydown',(e)=>{ if(e.key==='Enter'){ if(!cakeVisible) present.click(); else cake.click(); } if(e.key.toLowerCase()==='m') bgmBtn.click(); if(e.key.toLowerCase()==='f') fxBtn.click(); if(e.key.toLowerCase()==='r') restartBtn.click(); if(e.key.toLowerCase()==='g') gameModeBtn.click(); });
+  gameModeBtn.addEventListener('click', ()=>{
+    gameMode = !gameMode;
+    if(gameMode){
+      gameModeBtn.textContent = '🏆 Modo Jogo: ON';
+      // show game UI and reset certain counters for a fresh session
+      poppedCount = 0; poppedCountEl.textContent = poppedCount; gameScoreEl.style.display = 'block';
+      // make game easier for toddler: slower spawn at start, few balloons, then ramp gently
+      SPAWN_RATE = 1400; MAX_BALLOONS = 6;
+    } else {
+      gameModeBtn.textContent = '🎮 Modo Jogo';
+      gameScoreEl.style.display = 'none';
+      // revert to casual mode
+      SPAWN_RATE = 1200; MAX_BALLOONS = 8;
+    }
+    chime('default');
+  });
 
-    // ensure canvas sizing
-    resizeCanvas();
-  </script>
+  function restart(){
+    // remove balloon nodes
+    for(const b of Array.from(balloons)) try{ b.el.remove(); }catch(e){}
+    balloons.length = 0; particles.length = 0;
+    for(const f of Array.from(document.querySelectorAll('.floating-unlock'))) try{ f.remove(); }catch(e){}
+    unlocked.clear(); score = 0; poppedCount = 0; scoreEl.textContent = 0; poppedCountEl.textContent = 0;
+    messageEl.style.opacity = 0; cakeVisible=false; cakeMessageStage=0; cake.style.transform='translate(-50%,200%) scale(.95)';
+    SPAWN_RATE = 1200; MAX_BALLOONS = 8; gameMode = false; gameModeBtn.textContent = '🎮 Modo Jogo'; gameScoreEl.style.display = 'none';
+    mascot.classList.remove('show');
+    fxOn = true; fxBtn.textContent = '🔊 Efeitos: ON';
+  }
+  restartBtn.addEventListener('click', ()=>{ if(!audioCtx) initAudio(); chime('default'); restart(); });
+
+  // keyboard shortcuts (desktop convenience)
+  window.addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter'){ if(!cakeVisible) present.click(); else cake.click(); }
+    if(e.key.toLowerCase()==='f') fxBtn.click();
+    if(e.key.toLowerCase()==='r') restartBtn.click();
+    if(e.key.toLowerCase()==='g') gameModeBtn.click();
+  });
+
+  // show mascot animation for milestone
+  function showMascotCelebration(){
+    mascot.classList.add('show');
+    setTimeout(()=>mascot.classList.remove('show'), 1200);
+  }
+
+  // ensure audio unlock on first gesture
+  stage.addEventListener('pointerdown', ()=>{ if(!audioCtx) initAudio(); if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(()=>{}); }, {once:true,passive:true});
+
+  // ensure canvas sizing initially
+  resizeCanvas();
+</script>
 </body>
 </html>
