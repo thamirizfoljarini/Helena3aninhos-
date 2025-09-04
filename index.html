@@ -2,67 +2,67 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Feliz Aniversário, Helena!</title>
   <style>
-    :root{--accent:#FF3D84;--bg-day:linear-gradient(180deg,#87CEFA 0%, #FFFAF0 60%);}
-    html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;background:var(--bg-day);}
+    :root{
+      --accent:#FF3D84;
+      --bg:linear-gradient(180deg,#87CEFA 0%, #FFFAF0 62%);
+      --shadow:0 8px 24px rgba(0,0,0,.12);
+    }
+    html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;background:var(--bg);}
     #stage{position:relative;width:100vw;height:100vh;overflow:hidden;touch-action:none}
 
     /* Clouds */
     .clouds{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden}
-    .cloud{position:absolute;top:10%;left:-30%;width:360px;height:120px;background:linear-gradient(180deg,#fff,#f5fbff);border-radius:60px;box-shadow:0 10px 30px rgba(20,60,120,0.06);opacity:0.95}
-    .cloud.small{width:220px;height:80px;border-radius:50px;opacity:0.9}
+    .cloud{position:absolute;left:-35%;width:380px;height:120px;background:linear-gradient(180deg,#fff,#f6fbff);border-radius:60px;box-shadow:0 10px 30px rgba(20,60,120,.06);opacity:.95}
+    .cloud.small{width:230px;height:84px;border-radius:50px;opacity:.92}
     @keyframes drift{from{transform:translateX(-40vw)}to{transform:translateX(120vw)}}
 
     /* HUD */
-    .hud{position:absolute;left:18px;top:12px;z-index:60;color:#033;font-weight:700;text-shadow:0 1px 0 #fff}
-    .controls{position:absolute;right:18px;top:12px;z-index:60;display:flex;gap:10px;align-items:center}
-    .btn{background:rgba(255,255,255,0.95);border-radius:10px;padding:8px 12px;box-shadow:0 6px 20px rgba(0,0,0,0.08);cursor:pointer;font-weight:700;border:0}
+    .hud{position:absolute;left:18px;top:12px;z-index:60;color:#033;font-weight:800;text-shadow:0 1px 0 #fff}
+    .controls{position:absolute;right:16px;top:10px;z-index:60;display:flex;gap:8px;flex-wrap:wrap;max-width:90vw}
+    .btn{background:rgba(255,255,255,.96);backdrop-filter:saturate(140%) blur(6px);border-radius:12px;padding:8px 12px;box-shadow:var(--shadow);cursor:pointer;font-weight:800;border:0;white-space:nowrap}
 
     /* Score */
-    .score{position:absolute;left:18px;bottom:18px;z-index:60;background:rgba(255,255,255,0.9);padding:8px 12px;border-radius:12px;font-weight:800;box-shadow:0 8px 20px rgba(0,0,0,0.08)}
-
-    /* Pet (unicorn) - hidden until unlocked */
-    .pet{position:absolute;left:12%;bottom:12%;width:100px;height:100px;display:none;align-items:center;justify-content:center;font-size:64px;z-index:20;pointer-events:none;opacity:0;will-change:transform,opacity}
-    .pet.visible{display:flex;pointer-events:auto;opacity:1;transition:transform 700ms,opacity 600ms}
-    .pet.clickable{cursor:pointer}
+    .score{position:absolute;left:16px;bottom:16px;z-index:60;background:rgba(255,255,255,.92);padding:8px 12px;border-radius:12px;font-weight:900;box-shadow:var(--shadow)}
 
     /* Present */
-    .present{position:absolute;right:28px;bottom:28px;font-size:64px;z-index:50;cursor:pointer;user-select:none}
+    .present{position:absolute;right:16px;bottom:calc(18px + env(safe-area-inset-bottom));font-size:64px;z-index:50;cursor:pointer;user-select:none}
 
-    /* Cake area - label moved below cake to avoid overlap */
+    /* Cake */
     #cake{position:absolute;left:50%;bottom:10%;transform:translate(-50%,200%) scale(.95);z-index:55;transition:transform 700ms cubic-bezier(.2,.9,.3,1);display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
     #cake .bigcake{font-size:84px}
     #cake .hint{font-size:14px;color:#123}
-    #cake .label{font-weight:700;color:var(--accent);font-size:14px;padding:6px 10px;background:rgba(255,255,255,0.9);border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,0.06)}
+    #cake .label{font-weight:800;color:var(--accent);font-size:14px;padding:6px 10px;background:rgba(255,255,255,.92);border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,.06)}
 
-    /* Centered big message (centralized) - moved slightly up to avoid overlap with cake */
-    #message{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);font-size:56px;font-weight:900;color:var(--accent);text-shadow:2px 6px 12px rgba(0,0,0,0.18);opacity:0;z-index:70;pointer-events:none;text-align:center;padding:8px;max-width:90%}
-
-    /* floating rising visual for unlocked animals (non-interactive) */
-    @keyframes riseUp { 0%{ transform:translateY(0) rotate(0deg); opacity:1 } 100%{ transform:translateY(-120vh) rotate(30deg); opacity:0 } }
-    .floating-unlock{ position:absolute; font-size:56px; z-index:45; pointer-events:none; animation: riseUp 6s linear forwards }
+    /* Message */
+    #message{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);font-size:56px;font-weight:900;color:var(--accent);text-shadow:2px 6px 12px rgba(0,0,0,.18);opacity:0;z-index:70;pointer-events:none;text-align:center;padding:8px;max-width:90%}
 
     /* Balloons */
     .balloon{position:absolute;font-size:48px;z-index:40;cursor:pointer;user-select:none;touch-action:none}
 
-    /* Responsive tweaks */
-    @media (max-width:900px){ #message{top:40%} }
-    @media (max-width:600px){.pet{left:10%;bottom:10%;width:84px;height:84px;font-size:48px}.present{font-size:56px}#message{font-size:34px;top:36%}#cake .bigcake{font-size:64px}}
+    /* Floating unlock copy */
+    @keyframes riseUp { 0%{ transform:translateY(0) rotate(0deg); opacity:1 } 100%{ transform:translateY(-120vh) rotate(30deg); opacity:0 } }
+    .floating-unlock{ position:absolute; font-size:56px; z-index:45; pointer-events:none; animation: riseUp 6s linear forwards }
+
+    /* Responsive */
+    @media (max-width:900px){ .btn{padding:6px 10px;border-radius:10px} #message{top:40%} }
+    @media (max-width:600px){ #message{font-size:34px;top:36%} #cake .bigcake{font-size:64px} .present{font-size:56px} }
   </style>
 </head>
 <body>
   <div id="stage" role="application" aria-label="Surpresa de aniversário interativa para criança">
     <div class="clouds" id="clouds" aria-hidden="true"></div>
+
     <div class="hud">Surpresa de Aniversário 🎉</div>
     <div class="controls">
-      <button id="musicBtn" class="btn" aria-pressed="false">▶ Música</button>
+      <button id="bgmBtn" class="btn" aria-pressed="false">▶ Música</button>
+      <button id="fxBtn" class="btn" aria-pressed="true">🔊 Efeitos: ON</button>
       <button id="gameModeBtn" class="btn">🎮 Modo Jogo</button>
       <button id="restartBtn" class="btn">↻ Reiniciar</button>
     </div>
 
-    <div id="pet" class="pet" aria-hidden="true">🦄</div>
     <button id="present" class="present" aria-label="Abrir presente">🎁</button>
 
     <div id="cake" aria-hidden="true">
@@ -75,116 +75,119 @@
 
     <div class="score" id="scoreBox">Pontos: <span id="score">0</span></div>
 
-    <!-- Canvas for fireworks / particles -->
     <canvas id="fxCanvas" aria-hidden="true"></canvas>
-
-    <span class="visually-hidden" id="nameHolder">HELENA</span>
   </div>
 
   <script>
-    // ========== Config ==========
+    // ================= CONFIG =================
     const CHILD_NAME = 'HELENA';
-    const UNLOCKS = [ {score:5, emoji:'🦄', label:'Unicórnio'}, {score:12, emoji:'🧸', label:'Ursinho'}, {score:20, emoji:'🐱', label:'Gatinho'} ];
+    const UNLOCKS = [
+      {score:5,  key:'unicorn', emoji:'🦄', label:'Unicórnio'},
+      {score:12, key:'bear',    emoji:'🧸', label:'Ursinho'},
+      {score:20, key:'cat',     emoji:'🐱', label:'Gatinho'}
+    ];
     document.getElementById('message').textContent = `FELIZ ANIVERSÁRIO, ${CHILD_NAME}!!`;
 
-    // ========== Elements & state ==========
+    // ================= STATE & ELEMENTS =================
     const stage = document.getElementById('stage');
     const cloudsRoot = document.getElementById('clouds');
-    const pet = document.getElementById('pet');
     const present = document.getElementById('present');
     const cake = document.getElementById('cake');
     const cakeLabel = cake.querySelector('.label');
     const messageEl = document.getElementById('message');
+    const scoreEl = document.getElementById('score');
     const fxCanvas = document.getElementById('fxCanvas');
     const ctx = fxCanvas.getContext('2d');
-    const scoreEl = document.getElementById('score');
-    const musicBtn = document.getElementById('musicBtn');
+    const bgmBtn = document.getElementById('bgmBtn');
+    const fxBtn = document.getElementById('fxBtn');
     const restartBtn = document.getElementById('restartBtn');
     const gameModeBtn = document.getElementById('gameModeBtn');
 
-    let score = 0; let unlocked = new Set(); let gameMode=false; let spawnRate = 900; let lastSpawn=0; let particles = []; let balloons = []; let melodyInterval = null; let audioCtx = null; let musicPlaying = false;
+    let score = 0; let unlocked = new Set();
+    let gameMode=false; let spawnRate = 900; let lastSpawn=0;
+    let particles = []; let balloons = [];
+    let melodyInterval = null; let audioCtx = null; let musicOn=false; let fxOn=true;
 
-    // ========== Canvas sizing ==========
+    // ================= CANVAS SIZE =================
     function resizeCanvas(){ const dpr = Math.max(1, window.devicePixelRatio || 1); fxCanvas.width = Math.round(window.innerWidth * dpr); fxCanvas.height = Math.round(window.innerHeight * dpr); fxCanvas.style.width = window.innerWidth + 'px'; fxCanvas.style.height = window.innerHeight + 'px'; ctx.setTransform(dpr,0,0,dpr,0,0); }
     window.addEventListener('resize', resizeCanvas); resizeCanvas();
 
-    // ========== Clouds (CSS) ==========
+    // ================= CLOUDS =================
     function createCloud(topPx,size='large',delay=0,duration=50,leftOffset=-30){ const c=document.createElement('div'); c.className='cloud' + (size==='small'?' small':''); c.style.top = topPx+'px'; c.style.left = leftOffset + '%'; c.style.animation = `drift ${duration}s linear ${delay}s infinite`; cloudsRoot.appendChild(c); }
     createCloud(40,'large',0,55,-40); createCloud(120,'small',6,40,-60); createCloud(200,'large',12,70,-20); createCloud(300,'small',3,45,-50);
 
-    // ========== Audio: reliable background melody + chimes ==========
+    // ================= AUDIO =================
     function initAudio(){ if(audioCtx) return; try{ audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }catch(e){ console.warn('Audio não disponível',e); audioCtx = null; } }
-    function playNote(freq, duration=300, timeOffset=0, volume=0.02){ if(!audioCtx) return; try{ const o = audioCtx.createOscillator(); const g = audioCtx.createGain(); o.type='sine'; o.frequency.setValueAtTime(freq, audioCtx.currentTime + timeOffset/1000); g.gain.setValueAtTime(0.0001, audioCtx.currentTime + timeOffset/1000); g.gain.exponentialRampToValueAtTime(volume, audioCtx.currentTime + timeOffset/1000 + 0.02); o.connect(g); g.connect(audioCtx.destination); o.start(audioCtx.currentTime + timeOffset/1000); o.stop(audioCtx.currentTime + (timeOffset + duration)/1000 + 0.05); }catch(e){}
+    function playTone(freq, duration=220, volume=0.025, type='sine', tOffset=0){ if(!audioCtx || !fxOn) return; try{ const t = (audioCtx.currentTime + tOffset/1000); const o = audioCtx.createOscillator(); const g = audioCtx.createGain(); o.type=type; o.frequency.setValueAtTime(freq, t); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(volume, t+0.02); o.connect(g); g.connect(audioCtx.destination); o.start(t); o.stop(t + duration/1000 + .02);}catch(e){} }
+    function chime(kind='default'){
+      if(!audioCtx || !fxOn) return;
+      if(kind==='default'){ playTone(880,120,0.03,'triangle'); }
+      else if(kind==='unicorn'){ playTone(660,160,0.025,'sine'); playTone(990,180,0.022,'sine',120); playTone(1320,200,0.02,'sine',260); }
+      else if(kind==='bear'){ playTone(330,160,0.035,'square'); playTone(247,220,0.03,'sine',120); }
+      else if(kind==='cat'){ playTone(1046,100,0.02,'triangle'); playTone(1318,100,0.02,'triangle',90); }
     }
-    function startMelodyLoop(){ if(!audioCtx) return; if(melodyInterval) return; const seq=[440,660,880,660]; let i=0; melodyInterval = setInterval(()=>{ playNote(seq[i%seq.length],240,0,0.014); i++; },360); }
-    function stopMelodyLoop(){ if(melodyInterval){ clearInterval(melodyInterval); melodyInterval = null; } }
-    musicBtn.addEventListener('click', ()=>{ if(!audioCtx) initAudio(); if(!audioCtx) return; if(audioCtx.state === 'suspended'){ audioCtx.resume().catch(()=>{}); } if(!musicPlaying){ startMelodyLoop(); musicBtn.textContent='⏸ Música'; musicPlaying=true; } else { stopMelodyLoop(); musicBtn.textContent='▶ Música'; musicPlaying=false; } });
-    stage.addEventListener('pointerdown', ()=>{ if(!audioCtx) initAudio(); if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(()=>{}); }, {once:true,passive:true});
-    function chime(type='default'){ if(!audioCtx) initAudio(); if(!audioCtx) return; if(type==='default'){ playNote(880,120,0,0.02); playNote(1320,120,120,0.015); } else if(type==='unicorn'){ playNote(660,180,0,0.02); playNote(990,200,140,0.017); playNote(1320,200,320,0.015); } }
+    function startMelody(){ if(!audioCtx || melodyInterval) return; const seq=[440,660,880,660]; let i=0; melodyInterval = setInterval(()=>{ if(musicOn) playTone(seq[i%seq.length],240,0.012,'sine'); i++; },360); }
+    function stopMelody(){ if(melodyInterval){ clearInterval(melodyInterval); melodyInterval=null; } }
 
-    // ========== Balloons ==========
+    bgmBtn.addEventListener('click',()=>{ if(!audioCtx) initAudio(); if(!audioCtx) return; if(audioCtx.state==='suspended'){ audioCtx.resume().catch(()=>{});} musicOn=!musicOn; bgmBtn.textContent = musicOn ? '⏸ Música' : '▶ Música'; if(musicOn) startMelody(); else stopMelody(); });
+    fxBtn.addEventListener('click',()=>{ fxOn=!fxOn; fxBtn.textContent = fxOn ? '🔊 Efeitos: ON' : '🔇 Efeitos: OFF'; fxBtn.setAttribute('aria-pressed', fxOn ? 'true' : 'false'); });
+    stage.addEventListener('pointerdown', ()=>{ if(!audioCtx){ initAudio(); } if(audioCtx && audioCtx.state==='suspended'){ audioCtx.resume().catch(()=>{}); } }, {once:true,passive:true});
+
+    // ================= BALLOONS =================
     const MAX_BALLOONS = 22;
-    function spawnBalloon(){ if(balloons.length >= MAX_BALLOONS) return; const el = document.createElement('div'); el.className='balloon'; el.textContent='🎈'; el.setAttribute('role','button'); el.setAttribute('aria-label','Balão'); const x = Math.random() * (window.innerWidth - 80) + 40; const y = window.innerHeight + 80; el.style.left = x + 'px'; el.style.top = y + 'px'; stage.appendChild(el); const b = {x,y,vy:1.0 + Math.random()*1.8, el, sway:Math.random()*0.6, popped:false}; el.addEventListener('pointerdown', (ev)=>{ ev.stopPropagation(); if(b.popped) return; b.popped=true; popBalloon(b); }); balloons.push(b); }
-    function popBalloon(b){ if(!b.el) return; b.el.textContent='✨'; b.el.style.transform='scale(1.15) rotate(6deg)'; chime('default'); incrementScore(1); for(let i=0;i<8;i++) spawnParticleEmoji(b.x + (Math.random()-0.5)*30, b.y - 30 + (Math.random()-0.5)*20, ['✨','💖','🌟'][Math.floor(Math.random()*3)]); setTimeout(()=>{ try{ b.el.remove(); }catch(e){} }, 300); }
+    function spawnBalloon(type='normal'){ if(balloons.length >= MAX_BALLOONS) return; const el=document.createElement('div'); el.className='balloon'; let emoji='🎈', popKind='default', points=1; if(type==='unicorn'){emoji='🦄'; popKind='unicorn'; points=3;} if(type==='bear'){emoji='🧸'; popKind='bear'; points=2;} if(type==='cat'){emoji='🐱'; popKind='cat'; points=2;} el.textContent=emoji; el.setAttribute('role','button'); const x = Math.random() * (window.innerWidth - 80) + 40; const y = window.innerHeight + 80; el.style.left=x+'px'; el.style.top=y+'px'; stage.appendChild(el); const b={x,y,vy:1.0+Math.random()*1.8,el,sway:Math.random()*0.6,popped:false,type,popKind,points}; el.addEventListener('pointerdown',(ev)=>{ev.stopPropagation(); if(b.popped) return; b.popped=true; popBalloon(b);}); balloons.push(b); }
 
-    // ========== Particles & fireworks ==========
+    function popBalloon(b){ if(!b.el) return; b.el.textContent='✨'; b.el.style.transform='scale(1.15) rotate(6deg)'; chime(b.popKind); incrementScore(b.points); const emPool = (b.type==='unicorn')?['✨','💖','🌈']: (b.type==='bear')?['💖','✨','🧸'] : (b.type==='cat')?['✨','🐾','💖'] : ['✨','💖','🌟']; for(let i=0;i<8;i++) spawnParticleEmoji(b.x + (Math.random()-.5)*30, b.y - 30 + (Math.random()-.5)*20, emPool[Math.floor(Math.random()*emPool.length)]); setTimeout(()=>{ try{ b.el.remove(); }catch(e){} }, 280); }
+
+    // ================= PARTICLES =================
     function spawnParticleEmoji(x,y,emoji){ particles.push({x,y,vx:(Math.random()-0.5)*6, vy:(-1 - Math.random()*3), life:800 + Math.random()*600, born:performance.now(), emoji, size:12+Math.random()*18, gravity:0.06}); }
     function spawnConfetti(x,y,qty=40){ const colors=['#FF4DA6','#FFD166','#8AE6C1','#9CB4FF','#FFD1DC']; for(let i=0;i<qty;i++){ particles.push({x,y,vx:(Math.random()-0.5)*8, vy:(-2 - Math.random()*6), life:900 + Math.random()*600, born:performance.now(), color: colors[Math.floor(Math.random()*colors.length)], w:6+Math.random()*10, h:10+Math.random()*20, gravity:0.06, rot: Math.random()*360}); } }
-    function launchFireworkMain(x,y){ const cnt = 30 + Math.floor(Math.random()*40); for(let i=0;i<cnt;i++){ const ang=Math.random()*Math.PI*2; const speed=0.5 + Math.random()*6; particles.push({x,y,vx:Math.cos(ang)*speed, vy:Math.sin(ang)*speed -2, life:900+Math.random()*800, born:performance.now(), emoji:['❤️','💖','✨'][Math.floor(Math.random()*3)], size:10+Math.random()*28, gravity:0.04}); } }
+    function launchFirework(x,y){ const cnt=30+Math.floor(Math.random()*40); for(let i=0;i<cnt;i++){ const ang=Math.random()*Math.PI*2; const speed=0.5 + Math.random()*6; particles.push({x,y,vx:Math.cos(ang)*speed, vy:Math.sin(ang)*speed -2, life:900+Math.random()*800, born:performance.now(), emoji:['❤️','💖','✨'][Math.floor(Math.random()*3)], size:10+Math.random()*28, gravity:0.04}); } }
 
-    // ========== Unlock visuals only: floating copies (no persistent center icons) ==========
-    function spawnFloatingUnlockVisual(emoji){ const el = document.createElement('div'); el.className = 'floating-unlock'; el.textContent = emoji; // start near bottom center with small x random offset
-      const startX = window.innerWidth/2 + (Math.random()-0.5)*160; const startY = window.innerHeight*0.65 + (Math.random()-0.5)*40; el.style.left = startX + 'px'; el.style.top = startY + 'px'; stage.appendChild(el); // remove on animation end
-      el.addEventListener('animationend', ()=>el.remove()); }
-
-    function showUnlock(u){ // only floating visual and reveal pet when unicorn unlocked
-      spawnFloatingUnlockVisual(u.emoji);
-      if(u.label === 'Unicórnio' && !pet._visible){ pet._visible = true; pet.classList.add('visible'); pet.classList.add('clickable'); pet.style.transform = 'translateY(0) scale(1)'; pet.setAttribute('aria-label','Unicórnio desbloqueado: toque para som especial'); // bind handler once
-        const handler = (ev)=>{ ev.stopPropagation(); chime('unicorn'); incrementScore(2); spawnFloatingUnlockVisual('💫'); };
-        pet._bound = handler; pet.addEventListener('pointerdown', handler); }
+    // ================= UNLOCKS =================
+    function maybeSpawnSpecialRandom(){ // pequena chance de especiais mesmo sem desbloqueio
+      const r = Math.random();
+      if(r < 0.02) return spawnBalloon('unicorn');
+      if(r < 0.035) return spawnBalloon('bear');
+      if(r < 0.05) return spawnBalloon('cat');
     }
+    function onUnlock(u){ // garantia: ao desbloquear, spawna um especial
+      spawnBalloon(u.key);
+      const el=document.createElement('div'); el.className='floating-unlock'; el.textContent=u.emoji; const startX=window.innerWidth/2 + (Math.random()-0.5)*160; const startY=window.innerHeight*0.65 + (Math.random()-0.5)*40; el.style.left=startX+'px'; el.style.top=startY+'px'; stage.appendChild(el); el.addEventListener('animationend',()=>el.remove());
+    }
+    function checkUnlocks(){ for(const u of UNLOCKS){ if(score >= u.score && !unlocked.has(u.key)){ unlocked.add(u.key); onUnlock(u);} } }
 
-    function checkUnlocks(){ for(const u of UNLOCKS){ if(score >= u.score && !unlocked.has(u.label)){ unlocked.add(u.label); showUnlock(u); } } }
-
-    // ========== Score ==========
+    // ================= SCORE =================
     function incrementScore(n){ score += n; scoreEl.textContent = score; checkUnlocks(); }
 
-    // ========== Pet gentle bobbing (only if visible) ==========
-    let petBaseX = window.innerWidth * 0.12, petBaseY = window.innerHeight * 0.75; let petAng = 0; function updatePet(){ petAng += 0.02; const x = petBaseX + Math.sin(petAng) * 8; const y = petBaseY + Math.cos(petAng*1.3) * 6; if(pet._visible){ pet.style.left = x + 'px'; pet.style.top = y + 'px'; pet.style.opacity = 1; } requestAnimationFrame(updatePet); } updatePet();
-
-    // ========== Animation loop ==========
-    let lastFrame = performance.now(); function animate(now){ const dt = now - lastFrame; lastFrame = now; if(now - lastSpawn > (gameMode ? spawnRate/ (1 + Math.min(3, score/10)) : spawnRate)){ spawnBalloon(); lastSpawn = now; }
+    // ================= MAIN LOOP =================
+    let lastFrame = performance.now();
+    function animate(now){ const dt = now - lastFrame; lastFrame = now; if(now - lastSpawn > (gameMode ? spawnRate/ (1 + Math.min(3, score/10)) : spawnRate)){ // chance especial
+        if(Math.random() < 0.05) { maybeSpawnSpecialRandom(); } else { spawnBalloon('normal'); }
+        lastSpawn = now;
+      }
       // update balloons
-      for(let i=balloons.length-1;i>=0;i--){ const b = balloons[i]; if(b.popped){ balloons.splice(i,1); continue; } b.y -= b.vy * (dt/16); const sway = Math.sin((now/600) + b.sway*10) * 18; b.x += (sway * 0.0009) * (dt/16); if(b.el){ b.el.style.top = b.y + 'px'; b.el.style.left = b.x + 'px'; } if(b.y < -120){ try{ b.el.remove(); }catch(e){} balloons.splice(i,1); } }
-      // draw particles
+      for(let i=balloons.length-1;i>=0;i--){ const b=balloons[i]; if(b.popped){ balloons.splice(i,1); continue; } b.y -= b.vy * (dt/16); const sway = Math.sin((now/600) + b.sway*10) * 18; b.x += (sway * 0.0009) * (dt/16); if(b.el){ b.el.style.top=b.y+'px'; b.el.style.left=b.x+'px'; } if(b.y < -120){ try{ b.el.remove(); }catch(e){} balloons.splice(i,1); } }
+      // particles draw
       ctx.clearRect(0,0,fxCanvas.width,fxCanvas.height);
-      const keep = [];
-      for(const p of particles){ const age = now - p.born; if(age > p.life) continue; p.vy += (p.gravity || 0.04) * (dt/16); p.x += p.vx * (dt/16); p.y += p.vy * (dt/16); const alpha = Math.max(0, 1 - (age / p.life)); ctx.globalAlpha = alpha; if(p.emoji){ ctx.font = (p.size || 18) + 'px serif'; ctx.fillText(p.emoji, p.x, p.y); } else { ctx.save(); ctx.translate(p.x,p.y); ctx.rotate((p.rot||0) * Math.PI/180 * (age/500)); ctx.fillStyle = p.color || '#fff'; ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h); ctx.restore(); } ctx.globalAlpha = 1; keep.push(p); }
-      particles.length = 0; particles.push(...keep);
+      const keep=[]; for(const p of particles){ const age = now - p.born; if(age > p.life) continue; p.vy += (p.gravity || 0.04) * (dt/16); p.x += p.vx * (dt/16); p.y += p.vy * (dt/16); const alpha=Math.max(0,1-(age/p.life)); ctx.globalAlpha=alpha; if(p.emoji){ ctx.font=(p.size||18)+'px serif'; ctx.fillText(p.emoji,p.x,p.y); } else { ctx.save(); ctx.translate(p.x,p.y); ctx.rotate((p.rot||0) * Math.PI/180 * (age/500)); ctx.fillStyle=p.color||'#fff'; ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h); ctx.restore(); } ctx.globalAlpha=1; keep.push(p);} particles.length=0; particles.push(...keep);
       requestAnimationFrame(animate);
     }
     requestAnimationFrame(animate);
 
-    // ========== Present & Cake interactions ==========
-    let cakeVisible=false; let cakeMessageStage=0; present.addEventListener('click',(ev)=>{ ev.stopPropagation(); chime('default'); if(cakeVisible) return; cakeVisible=true; cake.style.transform = 'translate(-50%,0%) scale(1)'; cake.setAttribute('aria-hidden','false'); spawnConfetti(window.innerWidth/2, window.innerHeight/2, 32); });
-    cake.addEventListener('click',(ev)=>{ ev.stopPropagation(); if(!cakeVisible) return; chime('default'); // hide small cake label while message shows to avoid overlap
-      cakeLabel.style.opacity = 0; if(cakeMessageStage === 0){ messageEl.textContent = `FELIZ ANIVERSÁRIO, ${CHILD_NAME}!!`; messageEl.style.opacity = 1; cakeMessageStage = 1; for(let i=0;i<6;i++){ setTimeout(()=>{ launchFireworkMain((window.innerWidth * (0.25 + Math.random()*0.5)), (window.innerHeight * (0.2 + Math.random()*0.2))); }, i*420); } spawnConfetti(window.innerWidth/2, window.innerHeight/2, 80); } else if(cakeMessageStage === 1){ messageEl.textContent = `A dinda Thami e o dindo Gabi amam muito você!`; messageEl.style.opacity = 1; cakeMessageStage = 2; for(let i=0;i<12;i++){ setTimeout(()=>spawnParticleEmoji(window.innerWidth/2 + (Math.random()-0.5)*120, window.innerHeight/2 + (Math.random()-0.5)*80, '💖'), i*80); } } else { chime('default'); spawnConfetti(window.innerWidth/2, window.innerHeight/2, 18); } });
+    // ================= PRESENT & CAKE =================
+    let cakeVisible=false; let cakeMessageStage=0; present.addEventListener('click',(ev)=>{ ev.stopPropagation(); if(!audioCtx) initAudio(); chime('default'); if(cakeVisible) return; cakeVisible=true; cake.style.transform='translate(-50%,0%) scale(1)'; cake.setAttribute('aria-hidden','false'); spawnConfetti(window.innerWidth/2, window.innerHeight/2, 32); });
+    cake.addEventListener('click',(ev)=>{ ev.stopPropagation(); if(!cakeVisible) return; chime('default'); cakeLabel.style.opacity = 0; if(cakeMessageStage===0){ messageEl.textContent=`FELIZ ANIVERSÁRIO, ${CHILD_NAME}!!`; messageEl.style.opacity=1; cakeMessageStage=1; for(let i=0;i<6;i++){ setTimeout(()=>{ launchFirework((window.innerWidth*(0.25+Math.random()*0.5)), (window.innerHeight*(0.2+Math.random()*0.2))); }, i*420); } spawnConfetti(window.innerWidth/2, window.innerHeight/2, 80); } else if(cakeMessageStage===1){ messageEl.textContent='A dinda Thami e o dindo Gabi amam muito você!'; messageEl.style.opacity=1; cakeMessageStage=2; for(let i=0;i<12;i++){ setTimeout(()=>spawnParticleEmoji(window.innerWidth/2 + (Math.random()-0.5)*120, window.innerHeight/2 + (Math.random()-0.5)*80, '💖'), i*80); } } else { chime('default'); spawnConfetti(window.innerWidth/2, window.innerHeight/2, 18); } });
 
-    // ========== Game mode toggle ==========
-    gameModeBtn.addEventListener('click', ()=>{ gameMode = !gameMode; gameModeBtn.textContent = gameMode ? '🏆 Modo Jogo: ON' : '🎮 Modo Jogo'; chime('default'); });
-
-    // ========== Restart ==========
-    function restart(){ // remove balloons elements
-      for(const b of Array.from(balloons)){ try{ b.el.remove(); }catch(e){} } balloons.length = 0; particles.length = 0; // remove any floating visuals still on stage
-      for(const f of Array.from(document.querySelectorAll('.floating-unlock'))){ try{ f.remove(); }catch(e){} }
-      unlocked.clear(); score = 0; scoreEl.textContent = 0; messageEl.style.opacity = 0; cakeVisible = false; cakeMessageStage = 0; cake.style.transform = 'translate(-50%,200%) scale(.95)'; present.style.display = ''; pet.classList.remove('visible'); pet.classList.remove('clickable'); pet._visible = false; if(pet._bound){ pet.removeEventListener('pointerdown', pet._bound); delete pet._bound; }
-      stopMelodyLoop(); musicBtn.textContent='▶ Música'; musicPlaying=false; cakeLabel.style.opacity = 1; }
+    // ================= CONTROLS =================
+    gameModeBtn.addEventListener('click', ()=>{ gameMode=!gameMode; gameModeBtn.textContent = gameMode ? '🏆 Modo Jogo: ON' : '🎮 Modo Jogo'; chime('default'); });
+    function restart(){ for(const b of Array.from(balloons)){ try{ b.el.remove(); }catch(e){} } balloons.length=0; particles.length=0; for(const f of Array.from(document.querySelectorAll('.floating-unlock'))){ try{ f.remove(); }catch(e){} } unlocked.clear(); score=0; scoreEl.textContent=0; messageEl.style.opacity=0; cakeVisible=false; cakeMessageStage=0; cake.style.transform='translate(-50%,200%) scale(.95)'; stopMelody(); musicOn=false; bgmBtn.textContent='▶ Música'; fxOn=true; fxBtn.textContent='🔊 Efeitos: ON'; fxBtn.setAttribute('aria-pressed','true'); }
     restartBtn.addEventListener('click', ()=>{ chime('default'); restart(); });
 
-    // ========== Keyboard shortcuts ==========
-    window.addEventListener('keydown',(e)=>{ if(e.key === 'Enter'){ if(!cakeVisible) present.click(); else cake.click(); } if(e.key.toLowerCase()==='m') musicBtn.click(); if(e.key.toLowerCase()==='r') restartBtn.click(); if(e.key.toLowerCase()==='g') gameModeBtn.click(); });
+    // Shortcuts
+    window.addEventListener('keydown',(e)=>{ if(e.key==='Enter'){ if(!cakeVisible) present.click(); else cake.click(); } if(e.key.toLowerCase()==='m') bgmBtn.click(); if(e.key.toLowerCase()==='f') fxBtn.click(); if(e.key.toLowerCase()==='r') restartBtn.click(); if(e.key.toLowerCase()==='g') gameModeBtn.click(); });
 
-    // ensure initial canvas sizing
+    // ensure canvas sizing
     resizeCanvas();
   </script>
 </body>
