@@ -13,39 +13,55 @@
   }
   html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;background:var(--bg1);-webkit-font-smoothing:antialiased}
   #stage{position:relative;width:100vw;height:100vh;overflow:hidden;touch-action:none;padding-top:60px}
+
+  /* Nuvens animadas no fundo */
+  #clouds{position:absolute;inset:0;z-index:4;pointer-events:none;overflow:hidden}
+  .cloud{
+    position:absolute; top:0; left:-25%;
+    width:220px; height:90px; border-radius:50px;
+    background:radial-gradient(ellipse at 30% 60%,rgba(255,255,255,.95),rgba(255,255,255,.85) 60%,rgba(255,255,255,.6) 100%);
+    box-shadow:
+      60px -10px 0 10px rgba(255,255,255,.9),
+      130px 0 0 30px rgba(255,255,255,.9),
+      170px -15px 0 10px rgba(255,255,255,.85);
+    opacity:.9; filter:drop-shadow(0 8px 18px rgba(0,0,0,.08));
+    animation:drift linear infinite;
+  }
+  @keyframes drift { from{ transform:translateX(-30%);} to{ transform:translateX(130%);} }
+
   .hud{position:fixed;left:12px;top:8px;z-index:400;font-weight:800}
   .controls{position:fixed;right:8px;top:8px;z-index:410;display:flex;gap:8px;flex-wrap:wrap}
   .btn{background:var(--card);border-radius:12px;padding:8px 12px;box-shadow:var(--shadow);cursor:pointer;border:0;font-weight:800}
   .menuBtn{position:fixed;left:50%;transform:translateX(-50%);top:8px;z-index:420}
   .menuOverlay{position:fixed;inset:0;background:rgba(7,10,20,.45);display:none;align-items:center;justify-content:center;z-index:800}
   .menuCard{background:var(--card);padding:18px;border-radius:14px;box-shadow:var(--shadow);width:92%;max-width:760px}
+
   #gameArea{position:absolute;inset:0;z-index:10}
   #fxCanvas{position:absolute;left:0;top:0;width:100%;height:100%;z-index:30;pointer-events:none}
+
   .score{position:fixed;left:12px;bottom:14px;background:var(--card);padding:8px 12px;border-radius:12px;box-shadow:var(--shadow);z-index:400;font-weight:900}
-  .lives{position:fixed;right:12px;bottom:14px;background:var(--card);padding:8px 12px;border-radius:12px;box-shadow:var(--shadow);z-index:400}
   .centerMsg{position:fixed;left:50%;top:38%;transform:translate(-50%,-50%);z-index:700;font-size:36px;font-weight:900;color:var(--accent);text-align:center;display:none;padding:12px;background:rgba(255,255,255,.95);border-radius:12px;box-shadow:var(--shadow)}
   .balloon{position:absolute;font-size:48px;z-index:120;cursor:pointer;user-select:none;touch-action:none;transform-origin:center}
   .present{position:fixed;right:12px;bottom:calc(16px + env(safe-area-inset-bottom));font-size:56px;z-index:400;background:var(--card);padding:6px;border-radius:10px;box-shadow:var(--shadow);cursor:pointer}
 
-  /* Presente (overlay translúcido com blur) */
+  /* Presente translúcido (blur), sem texto de instrução */
   .giftOverlay{position:fixed;inset:0;display:none;z-index:900}
   .giftBackdrop{position:absolute;inset:0;background:rgba(0,0,0,.28);backdrop-filter:blur(2px)}
   .giftCard{
     position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
     width:min(92vw,1000px); padding:24px 18px;
-    background:rgba(255,255,255,.90); border:1px solid rgba(255,255,255,.85);
+    background:rgba(255,255,255,.78); /* mais translúcido */
+    border:1px solid rgba(255,255,255,.6);
     border-radius:16px; box-shadow:0 18px 60px rgba(0,0,0,.28);
   }
   .giftClose{position:absolute; top:8px; right:8px; border:0; border-radius:10px;padding:6px 10px; font-weight:900; cursor:pointer; background:var(--card); box-shadow:var(--shadow)}
   .giftBox{text-align:center}
   .giftTitle{font-size:clamp(36px,7.2vw,86px); font-weight:900; color:#ff3d84; text-shadow:0 6px 18px rgba(0,0,0,.12)}
-  .giftSubtitle{margin-top:8px; font-size:clamp(18px,3.8vw,28px); font-weight:800; color:#ff3d84}
   .giftCakeArea{margin-top:16px; display:flex; flex-direction:column; align-items:center; gap:8px}
   .giftCakeArea .bigcake{font-size:clamp(72px,10vw,120px); line-height:1}
-  .giftCakeArea .hint{display:none} /* escondida */
   .giftCakeArea .label{font-weight:800}
 
-  /* Puzzle modal */
+  /* Puzzle modal (centralizado e responsivo) */
   .puzzleModal{
     position:fixed; left:50%; top:50%; transform:translate(-50%,-50%);
     z-index:850; background:var(--card); border-radius:12px; padding:14px;
@@ -53,7 +69,7 @@
     width:min(96vw,560px); max-height:90vh; overflow:hidden;
   }
   .puzzleHeader{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-  #pCanvas{width:100%;height:420px;background:#f6f6f8;border-radius:6px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.04);touch-action:none}
+  #pCanvas{display:block;width:100%;height:auto;background:#f6f6f8;border-radius:6px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.04);touch-action:none}
   .puzzleControls{display:flex;gap:8px;justify-content:center;margin-top:8px;flex-wrap:wrap}
   .smallBtn{padding:6px 8px;border-radius:8px}
   .closeX{background:transparent;border:0;font-weight:800;cursor:pointer}
@@ -66,12 +82,14 @@
     .btn{padding:6px 8px;font-size:13px}
     .present{font-size:52px}
     .centerMsg{font-size:28px}
-    #pCanvas{height:360px}
   }
 </style>
 </head>
 <body>
   <div id="stage" role="application" aria-label="Surpresa interativa">
+    <!-- Nuvens -->
+    <div id="clouds" aria-hidden="true"></div>
+
     <div id="gameArea"></div>
     <canvas id="fxCanvas" aria-hidden="true"></canvas>
 
@@ -87,8 +105,6 @@
         <h2>Opções</h2>
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0">
           <button id="casualMode" class="btn">Casual (3 anos)</button>
-          <button id="challengeMode" class="btn">Desafio (vidas)</button>
-          <button id="survivalMode" class="btn">Sobrevivência (tempo)</button>
           <button id="puzzleMode" class="btn">Brincadeira (Puzzle)</button>
         </div>
         <div style="display:flex;gap:8px;align-items:center;margin-top:8px">
@@ -98,7 +114,6 @@
         <div style="margin-top:10px">
           <strong>Records</strong>
           <div>Maior Pontuação: <span id="bestScore">0</span></div>
-          <div>Maior Tempo (s): <span id="bestTime">0</span></div>
           <div>Melhor Puzzle: <span id="bestPuzzle">0</span></div>
         </div>
         <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
@@ -108,14 +123,13 @@
       </div>
     </div>
 
-    <!-- Presente -->
+    <!-- Presente (translúcido) -->
     <div id="giftOverlay" class="giftOverlay" aria-hidden="true">
       <div class="giftBackdrop" id="giftBackdrop"></div>
       <div class="giftCard" role="dialog" aria-modal="true" aria-label="Parabéns para Helena">
         <button id="giftClose" class="giftClose" aria-label="Fechar">✕</button>
         <div class="giftBox">
           <div id="giftTitle" class="giftTitle">FELIZ ANIVERSÁRIO, HELENA!!</div>
-          <div id="giftSubtitle" class="giftSubtitle">Toque no bolo para alternar a mensagem</div>
           <div class="giftCakeArea">
             <div class="bigcake" id="cakeClick" role="button" tabindex="0" aria-label="Bolo">🎂</div>
             <div class="label">Bolo Surpresa</div>
@@ -125,7 +139,6 @@
     </div>
 
     <div class="score" id="scoreBox">Pontos: <span id="score">0</span></div>
-    <div class="lives" id="livesBox" style="display:none">Vidas: <span id="lives">5</span></div>
     <div class="centerMsg" id="centerMsg"></div>
     <button class="present" id="presentBtn" aria-label="Abrir presente">🎁</button>
 
@@ -138,7 +151,7 @@
           <button id="puzzleExit" class="btn smallBtn closeX">Sair ✕</button>
         </div>
       </div>
-      <canvas id="pCanvas" width="420" height="420"></canvas>
+      <canvas id="pCanvas"></canvas>
       <div class="puzzleControls">
         <button id="pLeft" class="btn smallBtn">◀</button>
         <button id="pRotate" class="btn smallBtn">↻</button>
@@ -151,22 +164,20 @@
 <script>
 /* ===== elementos & estado ===== */
 const CHILD='HELENA';
+const cloudsBox=document.getElementById('clouds');
 const gameArea=document.getElementById('gameArea');
 const fxCanvas=document.getElementById('fxCanvas'); const ctx=fxCanvas.getContext('2d');
+
 const effectsBtn=document.getElementById('effectsBtn');
 const modeBtn=document.getElementById('modeBtn');
 const menuOpen=document.getElementById('menuOpen'); const menuOverlay=document.getElementById('menuOverlay'); const menuClose=document.getElementById('menuClose');
-const scoreEl=document.getElementById('score'); const livesBox=document.getElementById('livesBox'); const livesEl=document.getElementById('lives'); const centerMsg=document.getElementById('centerMsg');
+
+const scoreEl=document.getElementById('score'); const centerMsg=document.getElementById('centerMsg');
 const presentBtn=document.getElementById('presentBtn');
+const giftOverlay=document.getElementById('giftOverlay'); const giftBackdrop=document.getElementById('giftBackdrop'); const giftClose=document.getElementById('giftClose');
+const cakeClick=document.getElementById('cakeClick'); const giftTitle=document.getElementById('giftTitle');
 
-const giftOverlay=document.getElementById('giftOverlay');
-const giftBackdrop=document.getElementById('giftBackdrop');
-const giftClose=document.getElementById('giftClose');
-const cakeClick=document.getElementById('cakeClick');
-const giftTitle=document.getElementById('giftTitle');
-const giftSubtitle=document.getElementById('giftSubtitle');
-
-const toggleSave=document.getElementById('toggleSave'); const bestScoreEl=document.getElementById('bestScore'); const bestTimeEl=document.getElementById('bestTime'); const bestPuzzleEl=document.getElementById('bestPuzzle'); const resetRecords=document.getElementById('resetRecords');
+const toggleSave=document.getElementById('toggleSave'); const bestScoreEl=document.getElementById('bestScore'); const bestPuzzleEl=document.getElementById('bestPuzzle'); const resetRecords=document.getElementById('resetRecords');
 
 const pModal=document.getElementById('puzzleModal'); const pCanvas=document.getElementById('pCanvas'); const pctx=pCanvas.getContext('2d');
 const pRestart=document.getElementById('puzzleRestart'); const pExit=document.getElementById('puzzleExit'); const pLeft=document.getElementById('pLeft'); const pRight=document.getElementById('pRight'); const pRotate=document.getElementById('pRotate'); const pDrop=document.getElementById('pDrop');
@@ -175,7 +186,7 @@ let FX_ON=true,audioCtx=null,RECORDS_ENABLED=true;
 let MODE='casual', paused=false;
 let score=0,poppedCount=0;
 let balloons=[],particles=[],lastSpawn=0;
-let SPAWN_RATE=1100,MAX_BALLOONS=8,LIVES=5;
+let SPAWN_RATE=1200,MAX_BALLOONS=7;
 let lastPhrase='',unlocked=new Set();
 let presentMsgToggle=0;
 
@@ -194,8 +205,12 @@ function initAudio(){if(audioCtx)return;try{audioCtx=new(window.AudioContext||wi
 function playTone(freq,d=140,vol=0.03,type='sine',off=0){if(!audioCtx||!FX_ON)return;try{const t=audioCtx.currentTime+off/1000;const o=audioCtx.createOscillator();const g=audioCtx.createGain();o.type=type;o.frequency.setValueAtTime(freq,t);g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(vol,t+0.02);o.connect(g);g.connect(audioCtx.destination);o.start(t);o.stop(t+d/1000+.02);}catch(e){}}
 function chime(kind='pop'){if(!audioCtx||!FX_ON)return;if(kind==='pop')playTone(880,80,0.03,'triangle');else if(kind==='milestone'){playTone(660,150,0.03,'sine');playTone(880,160,0.02,'sine',100);}else if(kind==='unicorn'){playTone(880,120,0.03,'sine');playTone(1200,140,0.02,'sine',90);}else if(kind==='bear'){playTone(330,140,0.04,'square');playTone(250,140,0.03,'sine',90);}else if(kind==='cat'){playTone(1200,90,0.02,'triangle');playTone(1500,90,0.02,'triangle',80);}}
 
-/* fundo */
-function updateBackground(){if(score<10)document.body.style.background='linear-gradient(180deg,#87CEFA 0%, #FFFAF0 62%)';else if(score<20)document.body.style.background='linear-gradient(180deg,#A8E6CF 0%, #FFF8E1 62%)';else if(score<40)document.body.style.background='linear-gradient(180deg,#FFD3B6 0%, #FFF8F0 62%)';else document.body.style.background='linear-gradient(180deg,#E0BBE4 0%, #FFF0F8 62%)';}
+/* Fundo dinâmico (leve) */
+function updateBackground(){ if(score<10)document.body.style.background='linear-gradient(180deg,#87CEFA 0%, #FFFAF0 62%)'; else if(score<20)document.body.style.background='linear-gradient(180deg,#A8E6CF 0%, #FFF8E1 62%)'; else if(score<40)document.body.style.background='linear-gradient(180deg,#FFD3B6 0%, #FFF8F0 62%)'; else document.body.style.background='linear-gradient(180deg,#E0BBE4 0%, #FFF0F8 62%)'; }
+
+/* ===== Nuvens ===== */
+function spawnCloud(y, scale=1, speed=60){const c=document.createElement('div'); c.className='cloud'; c.style.top=y+'px'; c.style.transform=`translateX(-30%) scale(${scale})`; c.style.animationDuration=(speed+Math.random()*30)+'s'; cloudsBox.appendChild(c);}
+(function initClouds(){const h=window.innerHeight; for(let i=0;i<6;i++){spawnCloud(10+i*(h/7|0), 0.8+Math.random()*0.8, 55+i*7);} })();
 
 /* ===== balões ===== */
 function spawnBalloon(type='normal'){
@@ -220,27 +235,15 @@ function popBalloon(b){
   for(let i=0;i<8;i++)spawnParticleEmoji(b.x+(Math.random()-0.5)*30,b.y-30+(Math.random()-0.5)*20,pool[Math.floor(Math.random()*pool.length)]);
   setTimeout(()=>{b.el.remove();},240);
   if(MODE==='casual'){showCenter(pickRandomDifferent(POP_PHRASES),900); if(Math.random()<0.35)spawnSmallMascot(b.x,b.y);}
-  if(poppedCount%5===0){showCenter(pickRandomDifferent(MILESTONE_PHRASES),1200); chime('milestone'); spawnConfetti(window.innerWidth/2,window.innerHeight/2,30); SPAWN_RATE=Math.max(400,SPAWN_RATE-80); MAX_BALLOONS=Math.min(16,MAX_BALLOONS+1);}
+  if(poppedCount%5===0){showCenter(pickRandomDifferent(MILESTONE_PHRASES),1200); chime('milestone'); spawnConfetti(window.innerWidth/2,window.innerHeight/2,30); SPAWN_RATE=Math.max(450,SPAWN_RATE-80); MAX_BALLOONS=Math.min(14,MAX_BALLOONS+1);}
   checkUnlocks();
 }
-function handleOffscreen(i){
-  const b=balloons[i]; if(!b) return;
-  if(b.y<-140){ b.el.remove(); balloons.splice(i,1);
-    if(MODE==='challenge'){ LIVES--; livesEl.textContent=LIVES; chime('bear'); if(LIVES<=0) handleGameOver(); }
-  }
-}
+function handleOffscreen(i){const b=balloons[i]; if(b && b.y<-140){b.el.remove(); balloons.splice(i,1);}}
 
 /* ===== partículas ===== */
 function spawnParticleEmoji(x,y,emoji){particles.push({x,y,vx:(Math.random()-0.5)*6,vy:(-1-Math.random()*3),life:700+Math.random()*600,born:performance.now(),emoji,size:12+Math.random()*18,gravity:0.06});}
 function spawnConfetti(x,y,qty=40){const colors=['#FF4DA6','#FFD166','#8AE6C1','#9CB4FF','#FFD1DC'];for(let i=0;i<qty;i++)particles.push({x,y,vx:(Math.random()-0.5)*8,vy:(-2-Math.random()*6),life:900+Math.random()*600,born:performance.now(),color:colors[Math.floor(Math.random()*colors.length)],w:6+Math.random()*10,h:10+Math.random()*20,gravity:0.06,rot:Math.random()*360});}
-function spawnSparkles(x,y,qty=50){
-  for(let i=0;i<qty;i++){
-    const ang=Math.random()*Math.PI*2;
-    const spd=2+Math.random()*4;
-    const vx=Math.cos(ang)*spd, vy=Math.sin(ang)*spd-1.5;
-    particles.push({x,y,vx,vy,life:900+Math.random()*700,born:performance.now(),emoji:Math.random()<0.5?'✨':'💖',size:16+Math.random()*12,gravity:0.03});
-  }
-}
+function spawnSparkles(x,y,qty=50){for(let i=0;i<qty;i++){const ang=Math.random()*Math.PI*2;const spd=2+Math.random()*4;const vx=Math.cos(ang)*spd,vy=Math.sin(ang)*spd-1.5;particles.push({x,y,vx,vy,life:900+Math.random()*700,born:performance.now(),emoji:Math.random()<0.5?'✨':'💖',size:16+Math.random()*12,gravity:0.03});}}
 
 /* ===== desbloqueios ===== */
 const UNLOCKS=[{score:5,key:'unicorn',emoji:'🦄'},{score:12,key:'bear',emoji:'🧸'},{score:20,key:'cat',emoji:'🐱'}];
@@ -254,11 +257,9 @@ effectsBtn.addEventListener('click',()=>{FX_ON=!FX_ON;effectsBtn.textContent=FX_
 menuOpen.addEventListener('click',()=>{paused=true;giftOverlay.style.display='none';giftOverlay.setAttribute('aria-hidden','true');menuOverlay.style.display='flex';menuOverlay.setAttribute('aria-hidden','false');});
 menuClose.addEventListener('click',()=>{menuOverlay.style.display='none';menuOverlay.setAttribute('aria-hidden','true');paused=false;});
 document.getElementById('casualMode').addEventListener('click',()=>{setMode('casual');closeMenu();});
-document.getElementById('challengeMode').addEventListener('click',()=>{setMode('challenge');closeMenu();});
-document.getElementById('survivalMode').addEventListener('click',()=>{setMode('survival');closeMenu();});
 document.getElementById('puzzleMode').addEventListener('click',()=>{setMode('puzzle');closeMenu();openPuzzle();});
 function closeMenu(){menuOverlay.style.display='none';menuOverlay.setAttribute('aria-hidden','true');paused=false;}
-function setMode(m){MODE=m;modeBtn.textContent='Modo: '+(m==='casual'?'Casual':m==='challenge'?'Desafio':m==='survival'?'Sobrevivência':'Puzzle');for(const b of balloons){b.el.remove();}balloons.length=0;particles.length=0;score=0;poppedCount=0;scoreEl.textContent='0';SPAWN_RATE=m==='casual'?1300:m==='challenge'?1000:1200;MAX_BALLOONS=m==='casual'?6:m==='challenge'?8:6;LIVES=5;livesEl.textContent=LIVES;livesBox.style.display=(m==='challenge')?'block':'none';unlocked.clear();updateBackground();}
+function setMode(m){MODE=m;modeBtn.textContent='Modo: '+(m==='casual'?'Casual':'Puzzle');for(const b of balloons){b.el.remove();}balloons.length=0;particles.length=0;score=0;poppedCount=0;scoreEl.textContent='0';SPAWN_RATE=1200;MAX_BALLOONS=7;unlocked.clear();updateBackground();}
 
 /* ===== presente ===== */
 function openGift(){giftOverlay.style.display='block';giftOverlay.setAttribute('aria-hidden','false');paused=true;}
@@ -266,37 +267,25 @@ function closeGift(){giftOverlay.style.display='none';giftOverlay.setAttribute('
 presentBtn.addEventListener('click', ()=>{
   presentMsgToggle = 0;
   giftTitle.textContent = `FELIZ ANIVERSÁRIO, ${CHILD}!!`;
-  giftSubtitle.textContent = 'Toque no bolo para alternar a mensagem';
-  openGift();
-  fireworksAtTitle();
+  openGift(); fireworksAtTitle();
 });
 giftClose.addEventListener('click', closeGift);
 giftBackdrop.addEventListener('click', closeGift);
-
 cakeClick.addEventListener('click', ()=>{
-  if (presentMsgToggle === 0) {
-    giftTitle.textContent = 'A dinda Thami e o dindo Gabi amam muito você!';
-    giftSubtitle.textContent = '🎈🎉';
-    presentMsgToggle = 1;
-  } else {
-    giftTitle.textContent = `FELIZ ANIVERSÁRIO, ${CHILD}!!`;
-    giftSubtitle.textContent = 'Toque no bolo para alternar a mensagem';
-    presentMsgToggle = 0;
-  }
-  if(!audioCtx) initAudio(); chime('pop');
-  fireworksAtTitle();
+  presentMsgToggle ^= 1;
+  giftTitle.textContent = presentMsgToggle
+    ? 'A dinda Thami e o dindo Gabi amam muito você!'
+    : `FELIZ ANIVERSÁRIO, ${CHILD}!!`;
+  if(!audioCtx) initAudio(); chime('pop'); fireworksAtTitle();
 });
-function fireworksAtTitle(){const r=giftTitle.getBoundingClientRect();const cx=r.left+r.width/2;const cy=Math.max(20,r.top-12);spawnConfetti(cx,cy,90);spawnSparkles(cx,cy,90);}
+function fireworksAtTitle(){const r=giftTitle.getBoundingClientRect();const cx=r.left+r.width/2;const cy=Math.max(20,r.top-12);spawnConfetti(cx,cy,110);spawnSparkles(cx,cy,110);}
 
 /* ===== records ===== */
-const KEY_BEST_SCORE='hb_best_score',KEY_BEST_TIME='hb_best_time',KEY_BEST_PUZZLE='hb_best_puzzle';
-function updateRecordsUI(){bestScoreEl.textContent=Number(localStorage.getItem(KEY_BEST_SCORE)||0);bestTimeEl.textContent=Number(localStorage.getItem(KEY_BEST_TIME)||0);bestPuzzleEl.textContent=Number(localStorage.getItem(KEY_BEST_PUZZLE)||0);}
+const KEY_BEST_SCORE='hb_best_score',KEY_BEST_PUZZLE='hb_best_puzzle';
+function updateRecordsUI(){bestScoreEl.textContent=Number(localStorage.getItem(KEY_BEST_SCORE)||0);bestPuzzleEl.textContent=Number(localStorage.getItem(KEY_BEST_PUZZLE)||0);}
 toggleSave.addEventListener('click',()=>{RECORDS_ENABLED=!RECORDS_ENABLED;toggleSave.textContent=RECORDS_ENABLED?'Salvar: ON':'Salvar: OFF';});
-resetRecords.addEventListener('click',()=>{localStorage.removeItem(KEY_BEST_SCORE);localStorage.removeItem(KEY_BEST_TIME);localStorage.removeItem(KEY_BEST_PUZZLE);updateRecordsUI();showCenter('Records limpos',900);});
+resetRecords.addEventListener('click',()=>{localStorage.removeItem(KEY_BEST_SCORE);localStorage.removeItem(KEY_BEST_PUZZLE);updateRecordsUI();showCenter('Records limpos',900);});
 updateRecordsUI();
-
-/* ===== game over (desafio) ===== */
-function handleGameOver(){SPAWN_RATE=999999;showCenter('Game Over 😅',1500);setTimeout(()=>{setMode('challenge');},1100);}
 
 /* ===== loop ===== */
 let lastFrame=performance.now();
@@ -325,42 +314,53 @@ requestAnimationFrame(animate);
 /* ===== mascotes ===== */
 function spawnSmallMascot(x,y){const m=MASCOT_EMOJIS[Math.floor(Math.random()*MASCOT_EMOJIS.length)];const el=document.createElement('div');el.className='floating-unlock';el.style.fontSize='40px';el.textContent=m;el.style.left=(x+(Math.random()-0.5)*40)+'px';el.style.top=y+'px';gameArea.appendChild(el);el.addEventListener('animationend',()=>el.remove());}
 
-/* ===== puzzle (tetris-lite) + teclado + gestos ===== */
-const GCOL=10,GROW=18,CELL=22; let grid=[],cur=null,ptimer=null,pspeed=550,pscore=0,pgameOver=false;
+/* ===== puzzle (tetris-lite) – teclado e gestos ===== */
+const GCOL=10,GROW=18,CELL=22,PAD=10; let grid=[],cur=null,ptimer=null,pspeed=550,pscore=0,pgameOver=false;
 const SHAPES=[[[1,1,1,1]],[[1,1],[1,1]],[[0,1,0],[1,1,1]],[[1,0,0],[1,1,1]],[[0,0,1],[1,1,1]],[[1,1,0],[0,1,1]],[[0,1,1],[1,1,0]]];
 const COLORS=['#60a5fa','#fbbf24','#a78bfa','#22c55e','#fb7185','#38bdf8','#f59e0b'];
-
 let keyHandlerAttached=false, touchHandlerAttached=false;
+let gStartX=0,gStartY=0,gMoved=false;
 
+function pSizeCanvas(){
+  const w=GCOL*CELL+PAD*2, h=GROW*CELL+PAD*2;
+  const dpr=Math.max(1,window.devicePixelRatio||1);
+  pCanvas.width=Math.round(w*dpr); pCanvas.height=Math.round(h*dpr);
+  pCanvas.style.width='100%'; pCanvas.style.height='auto';
+  pctx.setTransform(dpr,0,0,dpr,0,0);
+}
 function pInit(){
   grid=Array.from({length:GROW},()=>Array(GCOL).fill(0)); pscore=0; pgameOver=false; pspeed=550;
-  newPiece(); autoFitCanvas(); drawGrid(); runLoop();
+  pSizeCanvas(); newPiece(); drawGrid(); runLoop();
 }
-function openPuzzle(){
-  document.body.style.overflow='hidden';
-  pModal.style.display='block';pModal.setAttribute('aria-hidden','false');paused=true; pCanvas.tabIndex=0; pCanvas.focus();
-  pInit(); attachPuzzleInputs();
-}
-pExit.addEventListener('click',()=>{closePuzzle();});
-pRestart.addEventListener('click',()=>pInit());
+function openPuzzle(){document.body.style.overflow='hidden'; pModal.style.display='block';pModal.setAttribute('aria-hidden','false');paused=true; pCanvas.tabIndex=0; pCanvas.focus(); pInit(); attachPuzzleInputs();}
 function closePuzzle(){stopLoop(); pModal.style.display='none';pModal.setAttribute('aria-hidden','true');paused=false; document.body.style.overflow=''; detachPuzzleInputs();}
+pExit.addEventListener('click',()=>closePuzzle());
+pRestart.addEventListener('click',()=>pInit());
+
 function newPiece(){const i=Math.floor(Math.random()*SHAPES.length);const m=SHAPES[i];cur={m,x:3,y:0,color:COLORS[i]}; if(collide(0,0,cur.m)) {pgameOver=true; stopLoop(); showCenter('Puzzle: Game Over',1200);} }
-function rotate(m){const r=m[0].map((_,i)=>m.map(row=>row[i]).reverse());return r;}
-function collide(dx,dy,mat){for(let y=0;y<mat.length;y++){for(let x=0;x<mat[0].length;x++){if(mat[y][x]){const nx=cur.x+x+dx, ny=cur.y+y+dy; if(nx<0||nx>=GCOL||ny>=GROW|| (ny>=0 && grid[ny][nx])) return true;}}}return false;}
+function rotate(m){return m[0].map((_,i)=>m.map(r=>r[i]).reverse());}
+function collide(dx,dy,mat){for(let y=0;y<mat.length;y++){for(let x=0;x<mat[0].length;x++){if(mat[y][x]){const nx=cur.x+x+dx, ny=cur.y+y+dy; if(nx<0||nx>=GCOL||ny>=GROW||(ny>=0 && grid[ny][nx])) return true;}}}return false;}
 function merge(){for(let y=0;y<cur.m.length;y++){for(let x=0;x<cur.m[0].length;x++){if(cur.m[y][x] && cur.y+y>=0){grid[cur.y+y][cur.x+x]=cur.color;}}}}
 function clearLines(){let lines=0;for(let y=GROW-1;y>=0;y--){if(grid[y].every(v=>v)){grid.splice(y,1);grid.unshift(Array(GCOL).fill(0));lines++;y++;}} if(lines){pscore+=lines*10; if(RECORDS_ENABLED){const best=Number(localStorage.getItem('hb_best_puzzle')||0); if(pscore>best){localStorage.setItem('hb_best_puzzle',pscore); updateRecordsUI();}}}}
 function step(){ if(pgameOver) return; if(!collide(0,1,cur.m)){cur.y++;} else {merge(); clearLines(); newPiece();} drawGrid();}
-function drawGrid(){pctx.clearRect(0,0,pCanvas.width,pCanvas.height); pctx.save(); pctx.translate(10,10);
-  for(let y=0;y<GROW;y++){for(let x=0;x<GCOL;x++){const v=grid[y][x]; if(v){pctx.fillStyle=v; pctx.fillRect(x*CELL,y*CELL,CELL-1,CELL-1);}}}
-  if(cur){pctx.fillStyle=cur.color; for(let y=0;y<cur.m.length;y++){for(let x=0;x<cur.m[0].length;x++){if(cur.m[y][x] && cur.y+y>=0){pctx.fillRect((cur.x+x)*CELL,(cur.y+y)*CELL,CELL-1,CELL-1);}}}}
-  pctx.strokeStyle='rgba(0,0,0,.06)'; for(let x=0;x<=GCOL;x++){pctx.beginPath();pctx.moveTo(x*CELL,0);pctx.lineTo(x*CELL,GROW*CELL);pctx.stroke();}
-  for(let y=0;y<=GROW;y++){pctx.beginPath();pctx.moveTo(0,y*CELL);pctx.lineTo(GCOL*y/GROW?0:0,y*CELL);pctx.stroke();}
+function drawGrid(){
+  pctx.clearRect(0,0,pCanvas.width,pCanvas.height);
+  pctx.save(); pctx.translate(PAD,PAD);
+  const w=GCOL*CELL, h=GROW*CELL;
+  // grade
+  pctx.strokeStyle='rgba(0,0,0,.06)';
+  for(let x=0;x<=GCOL;x++){pctx.beginPath();pctx.moveTo(x*CELL,0);pctx.lineTo(x*CELL,h);pctx.stroke();}
+  for(let y=0;y<=GROW;y++){pctx.beginPath();pctx.moveTo(0,y*CELL);pctx.lineTo(w,y*CELL);pctx.stroke();}
+  // peças fixas
+  for(let y=0;y<GROW;y++)for(let x=0;x<GCOL;x++){const v=grid[y][x]; if(v){pctx.fillStyle=v; pctx.fillRect(x*CELL,y*CELL,CELL-1,CELL-1);}}
+  // peça atual
+  if(cur){pctx.fillStyle=cur.color; for(let y=0;y<cur.m.length;y++)for(let x=0;x<cur.m[0].length;x++){if(cur.m[y][x] && cur.y+y>=0){pctx.fillRect((cur.x+x)*CELL,(cur.y+y)*CELL,CELL-1,CELL-1);}}}
   pctx.restore();
 }
 function runLoop(){stopLoop(); ptimer=setInterval(step,pspeed);}
 function stopLoop(){if(ptimer){clearInterval(ptimer);ptimer=null;}}
 
-/* teclado (desktop) */
+/* Controles: teclado */
 function onKey(e){
   if(pModal.getAttribute('aria-hidden')==='true') return;
   const k=e.key;
@@ -372,26 +372,26 @@ function onKey(e){
   if(k==='Escape' || k==='Esc'){ closePuzzle(); }
   if(k==='r' || k==='R'){ pInit(); }
 }
+/* Controles: botões */
+pLeft.onclick = ()=>{ if(!collide(-1,0,cur.m)){cur.x--;drawGrid();} };
+pRight.onclick= ()=>{ if(!collide(1,0,cur.m)){cur.x++;drawGrid();} };
+pRotate.onclick=()=>{ const r=rotate(cur.m); if(!collide(0,0,r)){cur.m=r;drawGrid();} };
+pDrop.onclick  =()=>{ while(!collide(0,1,cur.m))cur.y++; step(); };
 
-/* gestos (mobile) */
+/* Gestos touch */
 const SWIPE_T=22;
-let gStartX=0,gStartY=0,gMoved=false;
 function onTouchStart(ev){if(ev.touches.length>1)return;gMoved=false;gStartX=ev.touches[0].clientX;gStartY=ev.touches[0].clientY;}
 function onTouchMove(ev){
   if(ev.touches.length>1) return;
-  const dx=ev.touches[0].clientX-gStartX;
-  const dy=ev.touches[0].clientY-gStartY;
+  const dx=ev.touches[0].clientX-gStartX; const dy=ev.touches[0].clientY-gStartY;
   ev.preventDefault();
   if(Math.abs(dx)>SWIPE_T && Math.abs(dx)>Math.abs(dy)){
     gMoved=true;
     if(dx<0){ if(!collide(-1,0,cur.m)){cur.x--;drawGrid();} }
-    else   { if(!collide(1,0,cur.m)){cur.x++;drawGrid();} }
+    else    { if(!collide(1,0,cur.m)){cur.x++;drawGrid();} }
     gStartX=ev.touches[0].clientX;
   }else if(dy>SWIPE_T && Math.abs(dy)>Math.abs(dx)){
-    gMoved=true;
-    while(!collide(0,1,cur.m))cur.y++;
-    step();
-    gStartY=ev.touches[0].clientY;
+    gMoved=true; while(!collide(0,1,cur.m))cur.y++; step(); gStartY=ev.touches[0].clientY;
   }
 }
 function onTouchEnd(ev){
@@ -401,6 +401,8 @@ function onTouchEnd(ev){
     const r=rotate(cur.m); if(!collide(0,0,r)){cur.m=r;drawGrid();}
   }
 }
+
+/* Anexar/soltar handlers (sem duplicar) */
 function attachPuzzleInputs(){
   if(!keyHandlerAttached){window.addEventListener('keydown',onKey,{passive:false}); keyHandlerAttached=true;}
   if(!touchHandlerAttached){
@@ -419,11 +421,15 @@ function detachPuzzleInputs(){
     touchHandlerAttached=false;
   }
 }
-function autoFitCanvas(){const maxH=Math.min(420,Math.floor(window.innerHeight*0.55));pCanvas.style.height=maxH+'px';}
 
 /* ===== boot ===== */
 document.body.addEventListener('pointerdown',()=>{if(!audioCtx) initAudio(); if(audioCtx && audioCtx.state==='suspended') audioCtx.resume().catch(()=>{});},{once:true,passive:true});
-function prime(){resizeCanvas(); setMode('casual'); lastSpawn=performance.now(); for(let i=0;i<3;i++) setTimeout(()=>spawnBalloon(), i*250);}
+function prime(){
+  resizeCanvas();
+  setMode('casual');
+  lastSpawn=performance.now();
+  for(let i=0;i<3;i++) setTimeout(()=>spawnBalloon(), i*250);
+}
 prime();
 </script>
 </body>
