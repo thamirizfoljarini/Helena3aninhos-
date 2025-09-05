@@ -27,24 +27,22 @@
   .balloon{position:absolute;font-size:48px;z-index:120;cursor:pointer;user-select:none;touch-action:none;transform-origin:center}
   .present{position:fixed;right:12px;bottom:calc(16px + env(safe-area-inset-bottom));font-size:56px;z-index:400;background:var(--card);padding:6px;border-radius:10px;box-shadow:var(--shadow);cursor:pointer}
 
-  /* —— Overlay de parabéns com cartão —— */
+  /* —— Overlay do presente com blur e cartão translúcido —— */
   .giftOverlay{position:fixed;inset:0;display:none;z-index:900}
-  .giftBackdrop{position:absolute;inset:0;background:rgba(0,0,0,.28)}
+  .giftBackdrop{position:absolute;inset:0;background:rgba(0,0,0,.28);backdrop-filter:blur(2px)}
   .giftCard{
     position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
     width:min(92vw,1000px); padding:24px 18px;
-    background:rgba(255,255,255,.96); border-radius:16px; box-shadow:0 18px 60px rgba(0,0,0,.22);
+    background:rgba(255,255,255,.90); border:1px solid rgba(255,255,255,.85);
+    border-radius:16px; box-shadow:0 18px 60px rgba(0,0,0,.28);
   }
-  .giftClose{
-    position:absolute; top:8px; right:8px; border:0; border-radius:10px;
-    padding:6px 10px; font-weight:900; cursor:pointer; background:var(--card); box-shadow:var(--shadow)
-  }
+  .giftClose{position:absolute; top:8px; right:8px; border:0; border-radius:10px;padding:6px 10px; font-weight:900; cursor:pointer; background:var(--card); box-shadow:var(--shadow)}
   .giftBox{text-align:center}
   .giftTitle{font-size:clamp(36px,7.2vw,86px); font-weight:900; color:#ff3d84; text-shadow:0 6px 18px rgba(0,0,0,.12)}
   .giftSubtitle{margin-top:8px; font-size:clamp(18px,3.8vw,28px); font-weight:800; color:#ff3d84}
   .giftCakeArea{margin-top:16px; display:flex; flex-direction:column; align-items:center; gap:8px}
   .giftCakeArea .bigcake{font-size:clamp(72px,10vw,120px); line-height:1}
-  .giftCakeArea .hint{font-size:12px; color:#444}
+  .giftCakeArea .hint{display:none} /* removemos a frase abaixo do bolo */
   .giftCakeArea .label{font-weight:800}
 
   /* Puzzle modal (central fixo, responsivo) */
@@ -110,7 +108,7 @@
       </div>
     </div>
 
-    <!-- Overlay central de parabéns (com bolo dentro) -->
+    <!-- Overlay central do presente -->
     <div id="giftOverlay" class="giftOverlay" aria-hidden="true">
       <div class="giftBackdrop" id="giftBackdrop"></div>
       <div class="giftCard" role="dialog" aria-modal="true" aria-label="Parabéns para Helena">
@@ -118,10 +116,8 @@
         <div class="giftBox">
           <div id="giftTitle" class="giftTitle">FELIZ ANIVERSÁRIO, HELENA!!</div>
           <div id="giftSubtitle" class="giftSubtitle">Toque no bolo para alternar a mensagem</div>
-
           <div class="giftCakeArea">
             <div class="bigcake" id="cakeClick" role="button" tabindex="0" aria-label="Bolo">🎂</div>
-            <div class="hint">Toque no bolo para alternar a mensagem</div>
             <div class="label">Bolo Surpresa</div>
           </div>
         </div>
@@ -242,14 +238,7 @@ function spawnSparkles(x,y,qty=50){
     const ang=Math.random()*Math.PI*2;
     const spd=2+Math.random()*4;
     const vx=Math.cos(ang)*spd, vy=Math.sin(ang)*spd-1.5;
-    particles.push({
-      x,y,vx,vy,
-      life:900+Math.random()*700,
-      born:performance.now(),
-      emoji: Math.random()<0.5 ? '✨' : '💖',
-      size:16+Math.random()*12,
-      gravity:0.03
-    });
+    particles.push({x,y,vx,vy,life:900+Math.random()*700,born:performance.now(),emoji:Math.random()<0.5?'✨':'💖',size:16+Math.random()*12,gravity:0.03});
   }
 }
 
@@ -262,7 +251,7 @@ function spawnFloatingUnlock(emoji){const el=document.createElement('div');el.cl
 function showCenter(txt,ms=1000){centerMsg.textContent=txt;centerMsg.style.display='block';clearTimeout(centerMsg._t);centerMsg._t=setTimeout(()=>centerMsg.style.display='none',ms);}
 effectsBtn.addEventListener('click',()=>{FX_ON=!FX_ON;effectsBtn.textContent=FX_ON?'🔊 Efeitos: ON':'🔇 Efeitos: OFF'; if(!audioCtx) initAudio();});
 
-/* abrir menu pausa e fecha overlay se estiver aberto */
+/* abrir menu (pausa) */
 menuOpen.addEventListener('click',()=>{
   paused = true;
   giftOverlay.style.display='none';
@@ -279,29 +268,19 @@ function closeMenu(){menuOverlay.style.display='none';menuOverlay.setAttribute('
 function setMode(m){MODE=m;modeBtn.textContent='Modo: '+(m==='casual'?'Casual':m==='challenge'?'Desafio':m==='survival'?'Sobrevivência':'Puzzle');for(const b of balloons){b.el.remove();}balloons.length=0;particles.length=0;score=0;poppedCount=0;scoreEl.textContent='0';SPAWN_RATE=m==='casual'?1300:m==='challenge'?1000:1200;MAX_BALLOONS=m==='casual'?6:m==='challenge'?8:6;LIVES=5;livesEl.textContent=LIVES;livesBox.style.display=(m==='challenge')?'block':'none';unlocked.clear();updateBackground();}
 
 /* ===== PRESENTE / OVERLAY ===== */
-function openGift(){
-  giftOverlay.style.display='block';
-  giftOverlay.setAttribute('aria-hidden','false');
-  paused = true;
-}
-function closeGift(){
-  giftOverlay.style.display='none';
-  giftOverlay.setAttribute('aria-hidden','true');
-  paused = false;
-}
+function openGift(){giftOverlay.style.display='block';giftOverlay.setAttribute('aria-hidden','false');paused=true;}
+function closeGift(){giftOverlay.style.display='none';giftOverlay.setAttribute('aria-hidden','true');paused=false;}
 presentBtn.addEventListener('click', ()=>{
   presentMsgToggle = 0;
   giftTitle.textContent = `FELIZ ANIVERSÁRIO, ${CHILD}!!`;
   giftSubtitle.textContent = 'Toque no bolo para alternar a mensagem';
   openGift();
-  // confete + brilhos ao abrir
-  spawnConfetti(window.innerWidth/2, window.innerHeight*0.25, 80);
-  spawnSparkles(window.innerWidth/2, window.innerHeight*0.25, 60);
+  fireworksAtTitle();           // confetes/estrelas acima da mensagem
 });
 giftClose.addEventListener('click', closeGift);
 giftBackdrop.addEventListener('click', closeGift);
 
-/* clique no bolo: alterna mensagens + efeitos sempre */
+/* clica no bolo: alterna mensagens + fogos no topo do título */
 cakeClick.addEventListener('click', ()=>{
   if (presentMsgToggle === 0) {
     giftTitle.textContent = 'A dinda Thami e o dindo Gabi amam muito você!';
@@ -313,11 +292,17 @@ cakeClick.addEventListener('click', ()=>{
     presentMsgToggle = 0;
   }
   if(!audioCtx) initAudio(); chime('pop');
-  const cx = window.innerWidth/2;
-  const cy = window.innerHeight*0.52;
-  spawnConfetti(cx, cy, 70);
-  spawnSparkles(cx, cy, 80);
+  fireworksAtTitle();
 });
+
+/* fogos na área do título (acima do texto) */
+function fireworksAtTitle(){
+  const r = giftTitle.getBoundingClientRect();
+  const cx = r.left + r.width/2;
+  const cy = Math.max(20, r.top - 12);
+  spawnConfetti(cx, cy, 90);
+  spawnSparkles(cx, cy, 90);
+}
 
 /* ===== RECORDS ===== */
 const KEY_BEST_SCORE='hb_best_score',KEY_BEST_TIME='hb_best_time',KEY_BEST_PUZZLE='hb_best_puzzle';
@@ -357,7 +342,7 @@ requestAnimationFrame(animate);
 /* ===== MASCOTES VISUAIS ===== */
 function spawnSmallMascot(x,y){const m=MASCOT_EMOJIS[Math.floor(Math.random()*MASCOT_EMOJIS.length)];const el=document.createElement('div');el.className='floating-unlock';el.style.fontSize='40px';el.textContent=m;el.style.left=(x+(Math.random()-0.5)*40)+'px';el.style.top=y+'px';gameArea.appendChild(el);el.addEventListener('animationend',()=>el.remove());}
 
-/* ===== PUZZLE FUNCIONAL (tetris simplificado) + TECLADO + GESTOS ===== */
+/* ===== PUZZLE (tetris-lite) + TECLADO + GESTOS ===== */
 const GCOL=10,GROW=18,CELL=22; let grid=[],cur=null,ptimer=null,pspeed=550,pscore=0,pgameOver=false;
 const SHAPES=[[[1,1,1,1]],[[1,1],[1,1]],[[0,1,0],[1,1,1]],[[1,0,0],[1,1,1]],[[0,0,1],[1,1,1]],[[1,1,0],[0,1,1]],[[0,1,1],[1,1,0]]];
 const COLORS=['#60a5fa','#fbbf24','#a78bfa','#22c55e','#fb7185','#38bdf8','#f59e0b'];
@@ -370,20 +355,13 @@ function pInit(){
   newPiece(); autoFitCanvas(); drawGrid(); runLoop();
 }
 function openPuzzle(){
-  // trava o scroll do fundo
   document.body.style.overflow='hidden';
   pModal.style.display='block';pModal.setAttribute('aria-hidden','false');paused=true; pCanvas.tabIndex=0; pCanvas.focus();
   pInit(); attachPuzzleInputs();
 }
 pExit.addEventListener('click',()=>{closePuzzle();});
 pRestart.addEventListener('click',()=>pInit());
-
-function closePuzzle(){
-  stopLoop(); pModal.style.display='none';pModal.setAttribute('aria-hidden','true');paused=false;
-  document.body.style.overflow=''; // libera scroll
-  detachPuzzleInputs();
-}
-
+function closePuzzle(){stopLoop(); pModal.style.display='none';pModal.setAttribute('aria-hidden','true');paused=false; document.body.style.overflow=''; detachPuzzleInputs();}
 function newPiece(){const i=Math.floor(Math.random()*SHAPES.length);const m=SHAPES[i];cur={m,x:3,y:0,color:COLORS[i]}; if(collide(0,0,cur.m)) {pgameOver=true; stopLoop(); showCenter('Puzzle: Game Over',1200);} }
 function rotate(m){const r=m[0].map((_,i)=>m.map(row=>row[i]).reverse());return r;}
 function collide(dx,dy,mat){for(let y=0;y<mat.length;y++){for(let x=0;x<mat[0].length;x++){if(mat[y][x]){const nx=cur.x+x+dx, ny=cur.y+y+dy; if(nx<0||nx>=GCOL||ny>=GROW|| (ny>=0 && grid[ny][nx])) return true;}}}return false;}
@@ -400,7 +378,7 @@ function drawGrid(){pctx.clearRect(0,0,pCanvas.width,pCanvas.height); pctx.save(
 function runLoop(){stopLoop(); ptimer=setInterval(step,pspeed);}
 function stopLoop(){if(ptimer){clearInterval(ptimer);ptimer=null;}}
 
-/* —— Teclado (desktop) —— */
+/* Teclado (desktop) */
 function onKey(e){
   if(pModal.getAttribute('aria-hidden')==='true') return;
   const k=e.key;
@@ -413,25 +391,20 @@ function onKey(e){
   if(k==='r' || k==='R'){ pInit(); }
 }
 
-/* —— Gestos (mobile) —— */
-const SWIPE_T=22; // threshold px
-function onTouchStart(ev){
-  if(ev.touches.length>1) return;
-  touchMoved=false;
-  touchStartX=ev.touches[0].clientX;
-  touchStartY=ev.touches[0].clientY;
-}
+/* Gestos (mobile) */
+const SWIPE_T=22;
+let touchStartX=0,touchStartY=0,touchMoved=false;
+function onTouchStart(ev){if(ev.touches.length>1)return;touchMoved=false;touchStartX=ev.touches[0].clientX;touchStartY=ev.touches[0].clientY;}
 function onTouchMove(ev){
   if(ev.touches.length>1) return;
   const dx=ev.touches[0].clientX-touchStartX;
   const dy=ev.touches[0].clientY-touchStartY;
-  // bloqueia scroll de arrasto dentro do canvas
   ev.preventDefault();
   if(Math.abs(dx)>SWIPE_T && Math.abs(dx)>Math.abs(dy)){
     touchMoved=true;
     if(dx<0){ if(!collide(-1,0,cur.m)){cur.x--;drawGrid();} }
-    else{ if(!collide(1,0,cur.m)){cur.x++;drawGrid();} }
-    touchStartX=ev.touches[0].clientX; // para movimentos contínuos
+    else   { if(!collide(1,0,cur.m)){cur.x++;drawGrid();} }
+    touchStartX=ev.touches[0].clientX;
   }else if(dy>SWIPE_T && Math.abs(dy)>Math.abs(dx)){
     touchMoved=true;
     while(!collide(0,1,cur.m))cur.y++;
@@ -442,12 +415,10 @@ function onTouchMove(ev){
 function onTouchEnd(ev){
   const dx=(ev.changedTouches?.[0]?.clientX||0)-touchStartX;
   const dy=(ev.changedTouches?.[0]?.clientY||0)-touchStartY;
-  // toque (quase sem movimento) = girar
   if(!touchMoved && Math.abs(dx)<10 && Math.abs(dy)<10){
     const r=rotate(cur.m); if(!collide(0,0,r)){cur.m=r;drawGrid();}
   }
 }
-
 function attachPuzzleInputs(){
   if(!keyHandlerAttached){window.addEventListener('keydown',onKey,{passive:false}); keyHandlerAttached=true;}
   if(!touchHandlerAttached){
@@ -466,13 +437,7 @@ function detachPuzzleInputs(){
     touchHandlerAttached=false;
   }
 }
-
-/* Ajusta canvas ao abrir (dentro do modal) */
-function autoFitCanvas(){
-  // mantém margens internas do cartão
-  const maxH = Math.min(420, Math.floor(window.innerHeight*0.55));
-  pCanvas.style.height = maxH+'px';
-}
+function autoFitCanvas(){const maxH=Math.min(420,Math.floor(window.innerHeight*0.55));pCanvas.style.height=maxH+'px';}
 
 /* ===== BOOT ===== */
 document.body.addEventListener('pointerdown',()=>{if(!audioCtx) initAudio(); if(audioCtx && audioCtx.state==='suspended') audioCtx.resume().catch(()=>{});},{once:true,passive:true});
