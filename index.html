@@ -31,8 +31,8 @@
   .giftOverlay{position:fixed;inset:0;display:none;z-index:900}
   .giftBackdrop{position:absolute;inset:0;background:rgba(0,0,0,.28)}
   .giftCard{
-    position:relative; z-index:1;
-    width:min(92vw,1000px); margin:6vh auto; padding:24px 18px;
+    position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+    width:min(92vw,1000px); padding:24px 18px;
     background:rgba(255,255,255,.96); border-radius:16px; box-shadow:0 18px 60px rgba(0,0,0,.22);
   }
   .giftClose{
@@ -47,11 +47,16 @@
   .giftCakeArea .hint{font-size:12px; color:#444}
   .giftCakeArea .label{font-weight:800}
 
-  /* Puzzle modal */
-  .puzzleModal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:850;background:var(--card);border-radius:12px;padding:14px;box-shadow:0 16px 48px rgba(0,0,0,.28);display:none;width:min(92vw,560px)}
+  /* Puzzle modal (central fixo, responsivo) */
+  .puzzleModal{
+    position:fixed; left:50%; top:50%; transform:translate(-50%,-50%);
+    z-index:850; background:var(--card); border-radius:12px; padding:14px;
+    box-shadow:0 16px 48px rgba(0,0,0,.28); display:none;
+    width:min(96vw,560px); max-height:90vh; overflow:hidden;
+  }
   .puzzleHeader{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-  #pCanvas{width:100%;height:420px;background:#f6f6f8;border-radius:6px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.04)}
-  .puzzleControls{display:flex;gap:8px;justify-content:center;margin-top:8px}
+  #pCanvas{width:100%;height:420px;background:#f6f6f8;border-radius:6px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.04);touch-action:none}
+  .puzzleControls{display:flex;gap:8px;justify-content:center;margin-top:8px;flex-wrap:wrap}
   .smallBtn{padding:6px 8px;border-radius:8px}
   .closeX{background:transparent;border:0;font-weight:800;cursor:pointer}
 
@@ -63,6 +68,7 @@
     .btn{padding:6px 8px;font-size:13px}
     .present{font-size:52px}
     .centerMsg{font-size:28px}
+    #pCanvas{height:360px}
   }
 </style>
 </head>
@@ -172,7 +178,7 @@ const pRestart=document.getElementById('puzzleRestart'); const pExit=document.ge
 let FX_ON=true,audioCtx=null,RECORDS_ENABLED=true;
 let MODE='casual', paused=false;
 let score=0,poppedCount=0;
-let balloons=[],particles=[],lastSpawn=0;  /* única declaração de lastSpawn */
+let balloons=[],particles=[],lastSpawn=0;
 let SPAWN_RATE=1100,MAX_BALLOONS=8,LIVES=5;
 let lastPhrase='',unlocked=new Set();
 let presentMsgToggle=0;
@@ -351,14 +357,33 @@ requestAnimationFrame(animate);
 /* ===== MASCOTES VISUAIS ===== */
 function spawnSmallMascot(x,y){const m=MASCOT_EMOJIS[Math.floor(Math.random()*MASCOT_EMOJIS.length)];const el=document.createElement('div');el.className='floating-unlock';el.style.fontSize='40px';el.textContent=m;el.style.left=(x+(Math.random()-0.5)*40)+'px';el.style.top=y+'px';gameArea.appendChild(el);el.addEventListener('animationend',()=>el.remove());}
 
-/* ===== PUZZLE FUNCIONAL (tetris simplificado) ===== */
+/* ===== PUZZLE FUNCIONAL (tetris simplificado) + TECLADO + GESTOS ===== */
 const GCOL=10,GROW=18,CELL=22; let grid=[],cur=null,ptimer=null,pspeed=550,pscore=0,pgameOver=false;
 const SHAPES=[[[1,1,1,1]],[[1,1],[1,1]],[[0,1,0],[1,1,1]],[[1,0,0],[1,1,1]],[[0,0,1],[1,1,1]],[[1,1,0],[0,1,1]],[[0,1,1],[1,1,0]]];
 const COLORS=['#60a5fa','#fbbf24','#a78bfa','#22c55e','#fb7185','#38bdf8','#f59e0b'];
-function pInit(){grid=Array.from({length:GROW},()=>Array(GCOL).fill(0)); pscore=0; pgameOver=false; pspeed=550; newPiece(); drawGrid(); runLoop();}
-function openPuzzle(){pModal.style.display='block';pModal.setAttribute('aria-hidden','false');paused=true;pInit();}
-pExit.addEventListener('click',()=>{pModal.style.display='none';pModal.setAttribute('aria-hidden','true');paused=false;});
+
+let keyHandlerAttached=false, touchHandlerAttached=false;
+let touchStartX=0,touchStartY=0,touchMoved=false;
+
+function pInit(){
+  grid=Array.from({length:GROW},()=>Array(GCOL).fill(0)); pscore=0; pgameOver=false; pspeed=550;
+  newPiece(); autoFitCanvas(); drawGrid(); runLoop();
+}
+function openPuzzle(){
+  // trava o scroll do fundo
+  document.body.style.overflow='hidden';
+  pModal.style.display='block';pModal.setAttribute('aria-hidden','false');paused=true; pCanvas.tabIndex=0; pCanvas.focus();
+  pInit(); attachPuzzleInputs();
+}
+pExit.addEventListener('click',()=>{closePuzzle();});
 pRestart.addEventListener('click',()=>pInit());
+
+function closePuzzle(){
+  stopLoop(); pModal.style.display='none';pModal.setAttribute('aria-hidden','true');paused=false;
+  document.body.style.overflow=''; // libera scroll
+  detachPuzzleInputs();
+}
+
 function newPiece(){const i=Math.floor(Math.random()*SHAPES.length);const m=SHAPES[i];cur={m,x:3,y:0,color:COLORS[i]}; if(collide(0,0,cur.m)) {pgameOver=true; stopLoop(); showCenter('Puzzle: Game Over',1200);} }
 function rotate(m){const r=m[0].map((_,i)=>m.map(row=>row[i]).reverse());return r;}
 function collide(dx,dy,mat){for(let y=0;y<mat.length;y++){for(let x=0;x<mat[0].length;x++){if(mat[y][x]){const nx=cur.x+x+dx, ny=cur.y+y+dy; if(nx<0||nx>=GCOL||ny>=GROW|| (ny>=0 && grid[ny][nx])) return true;}}}return false;}
@@ -374,10 +399,80 @@ function drawGrid(){pctx.clearRect(0,0,pCanvas.width,pCanvas.height); pctx.save(
 }
 function runLoop(){stopLoop(); ptimer=setInterval(step,pspeed);}
 function stopLoop(){if(ptimer){clearInterval(ptimer);ptimer=null;}}
-pLeft.addEventListener('click',()=>{if(!cur||pgameOver)return;if(!collide(-1,0,cur.m)){cur.x--;drawGrid();}});
-pRight.addEventListener('click',()=>{if(!cur||pgameOver)return;if(!collide(1,0,cur.m)){cur.x++;drawGrid();}});
-pRotate.addEventListener('click',()=>{if(!cur||pgameOver)return;const r=rotate(cur.m);if(!collide(0,0,r)){cur.m=r;drawGrid();}});
-pDrop.addEventListener('click',()=>{if(!cur||pgameOver)return;while(!collide(0,1,cur.m))cur.y++;step();});
+
+/* —— Teclado (desktop) —— */
+function onKey(e){
+  if(pModal.getAttribute('aria-hidden')==='true') return;
+  const k=e.key;
+  if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown',' ','Escape','Esc','r','R'].includes(k)) e.preventDefault();
+  if(k==='ArrowLeft'){ if(!collide(-1,0,cur.m)){cur.x--;drawGrid();} }
+  if(k==='ArrowRight'){ if(!collide(1,0,cur.m)){cur.x++;drawGrid();} }
+  if(k==='ArrowUp'){ const r=rotate(cur.m); if(!collide(0,0,r)){cur.m=r;drawGrid();} }
+  if(k==='ArrowDown' || k===' '){ while(!collide(0,1,cur.m))cur.y++; step(); }
+  if(k==='Escape' || k==='Esc'){ closePuzzle(); }
+  if(k==='r' || k==='R'){ pInit(); }
+}
+
+/* —— Gestos (mobile) —— */
+const SWIPE_T=22; // threshold px
+function onTouchStart(ev){
+  if(ev.touches.length>1) return;
+  touchMoved=false;
+  touchStartX=ev.touches[0].clientX;
+  touchStartY=ev.touches[0].clientY;
+}
+function onTouchMove(ev){
+  if(ev.touches.length>1) return;
+  const dx=ev.touches[0].clientX-touchStartX;
+  const dy=ev.touches[0].clientY-touchStartY;
+  // bloqueia scroll de arrasto dentro do canvas
+  ev.preventDefault();
+  if(Math.abs(dx)>SWIPE_T && Math.abs(dx)>Math.abs(dy)){
+    touchMoved=true;
+    if(dx<0){ if(!collide(-1,0,cur.m)){cur.x--;drawGrid();} }
+    else{ if(!collide(1,0,cur.m)){cur.x++;drawGrid();} }
+    touchStartX=ev.touches[0].clientX; // para movimentos contínuos
+  }else if(dy>SWIPE_T && Math.abs(dy)>Math.abs(dx)){
+    touchMoved=true;
+    while(!collide(0,1,cur.m))cur.y++;
+    step();
+    touchStartY=ev.touches[0].clientY;
+  }
+}
+function onTouchEnd(ev){
+  const dx=(ev.changedTouches?.[0]?.clientX||0)-touchStartX;
+  const dy=(ev.changedTouches?.[0]?.clientY||0)-touchStartY;
+  // toque (quase sem movimento) = girar
+  if(!touchMoved && Math.abs(dx)<10 && Math.abs(dy)<10){
+    const r=rotate(cur.m); if(!collide(0,0,r)){cur.m=r;drawGrid();}
+  }
+}
+
+function attachPuzzleInputs(){
+  if(!keyHandlerAttached){window.addEventListener('keydown',onKey,{passive:false}); keyHandlerAttached=true;}
+  if(!touchHandlerAttached){
+    pCanvas.addEventListener('touchstart',onTouchStart,{passive:false});
+    pCanvas.addEventListener('touchmove',onTouchMove,{passive:false});
+    pCanvas.addEventListener('touchend',onTouchEnd,{passive:false});
+    touchHandlerAttached=true;
+  }
+}
+function detachPuzzleInputs(){
+  if(keyHandlerAttached){window.removeEventListener('keydown',onKey,{passive:false}); keyHandlerAttached=false;}
+  if(touchHandlerAttached){
+    pCanvas.removeEventListener('touchstart',onTouchStart,{passive:false});
+    pCanvas.removeEventListener('touchmove',onTouchMove,{passive:false});
+    pCanvas.removeEventListener('touchend',onTouchEnd,{passive:false});
+    touchHandlerAttached=false;
+  }
+}
+
+/* Ajusta canvas ao abrir (dentro do modal) */
+function autoFitCanvas(){
+  // mantém margens internas do cartão
+  const maxH = Math.min(420, Math.floor(window.innerHeight*0.55));
+  pCanvas.style.height = maxH+'px';
+}
 
 /* ===== BOOT ===== */
 document.body.addEventListener('pointerdown',()=>{if(!audioCtx) initAudio(); if(audioCtx && audioCtx.state==='suspended') audioCtx.resume().catch(()=>{});},{once:true,passive:true});
