@@ -25,19 +25,21 @@
   .lives{position:fixed;right:12px;bottom:14px;background:var(--card);padding:8px 12px;border-radius:12px;box-shadow:var(--shadow);z-index:400}
   .centerMsg{position:fixed;left:50%;top:38%;transform:translate(-50%,-50%);z-index:700;font-size:36px;font-weight:900;color:var(--accent);text-align:center;display:none;padding:12px;background:rgba(255,255,255,.95);border-radius:12px;box-shadow:var(--shadow)}
   .balloon{position:absolute;font-size:48px;z-index:120;cursor:pointer;user-select:none;touch-action:none;transform-origin:center}
-  /* Presente */
+
+  /* Presente + overlay central */
   .present{position:fixed;right:12px;bottom:calc(16px + env(safe-area-inset-bottom));font-size:56px;z-index:400;background:var(--card);padding:6px;border-radius:10px;box-shadow:var(--shadow);cursor:pointer}
-  /* Bolo (fica visível junto do overlay de parabéns) */
+  #giftOverlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:900;background:rgba(255,255,255,0)}
+  .giftBox{max-width:min(92vw,900px);margin:0 16px;text-align:center}
+  .giftTitle{font-size:clamp(32px,7vw,72px);font-weight:900;color:#ff3d84;text-shadow:0 6px 18px rgba(0,0,0,.18)}
+  .giftSubtitle{margin-top:10px;font-size:clamp(18px,3.8vw,28px);font-weight:800;color:#ff3d84}
+
+  /* Bolo */
   #cake{position:fixed;left:50%;bottom:14%;transform:translate(-50%,200%) scale(.95);z-index:910;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;transition:transform .6s}
   #cake.visible{transform:translate(-50%,0) scale(1)}
   .bigcake{font-size:96px}
   .hint{font-size:12px;color:#444}
   .label{font-weight:800}
-  /* Overlay central de parabéns */
-  #giftOverlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:900;background:rgba(255,255,255,.0);pointer-events:none}
-  .giftBox{pointer-events:auto;max-width:min(92vw,900px);margin:0 16px;text-align:center}
-  .giftTitle{font-size:clamp(32px,7vw,72px);font-weight:900;color:#ff3d84;text-shadow:0 6px 18px rgba(0,0,0,.18)}
-  .giftSubtitle{margin-top:10px;font-size:clamp(18px,3.8vw,28px);font-weight:800;color:#ff3d84}
+
   /* Puzzle modal */
   .puzzleModal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:850;background:var(--card);border-radius:12px;padding:14px;box-shadow:0 16px 48px rgba(0,0,0,.28);display:none;width:min(92vw,560px)}
   .puzzleHeader{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
@@ -45,10 +47,11 @@
   .puzzleControls{display:flex;gap:8px;justify-content:center;margin-top:8px}
   .smallBtn{padding:6px 8px;border-radius:8px}
   .closeX{background:transparent;border:0;font-weight:800;cursor:pointer}
+
   /* Mascotes flutuantes */
   @keyframes riseUp{0%{transform:translateY(0) rotate(0);opacity:1}100%{transform:translateY(-140vh) rotate(30deg);opacity:0}}
   .floating-unlock{position:absolute;font-size:56px;z-index:190;pointer-events:none;animation:riseUp 6s linear forwards}
-  /* Responsivo */
+
   @media(max-width:600px){
     .btn{padding:6px 8px;font-size:13px}
     .present{font-size:52px}
@@ -146,7 +149,6 @@ const scoreEl=document.getElementById('score'); const livesBox=document.getEleme
 const presentBtn=document.getElementById('presentBtn'); const cake=document.getElementById('cake'); const cakeClick=document.getElementById('cakeClick');
 const giftOverlay=document.getElementById('giftOverlay'); const giftTitle=document.getElementById('giftTitle'); const giftSubtitle=document.getElementById('giftSubtitle');
 
-const casualBtn=document.getElementById('casualMode'); const challengeBtn=document.getElementById('challengeMode'); const survivalBtn=document.getElementById('survivalMode'); const puzzleBtn=document.getElementById('puzzleMode');
 const toggleSave=document.getElementById('toggleSave'); const bestScoreEl=document.getElementById('bestScore'); const bestTimeEl=document.getElementById('bestTime'); const bestPuzzleEl=document.getElementById('bestPuzzle'); const resetRecords=document.getElementById('resetRecords');
 
 const pModal=document.getElementById('puzzleModal'); const pCanvas=document.getElementById('pCanvas'); const pctx=pCanvas.getContext('2d');
@@ -155,7 +157,7 @@ const pRestart=document.getElementById('puzzleRestart'); const pExit=document.ge
 let FX_ON=true,audioCtx=null,RECORDS_ENABLED=true;
 let MODE='casual', paused=false;
 let score=0,poppedCount=0;
-let balloons=[],particles=[],lastSpawn=0;
+let balloons=[],particles=[],lastSpawn=0;  /* <— única declaração de lastSpawn */
 let SPAWN_RATE=1100,MAX_BALLOONS=8,LIVES=5;
 let lastPhrase='',unlocked=new Set();
 let presentMsgToggle=0;
@@ -243,7 +245,7 @@ cakeClick.addEventListener('click',()=>{
   if(!audioCtx) initAudio(); chime('pop');
 });
 
-/* ===== RECORDS (mantidos) ===== */
+/* ===== RECORDS ===== */
 const KEY_BEST_SCORE='hb_best_score',KEY_BEST_TIME='hb_best_time',KEY_BEST_PUZZLE='hb_best_puzzle';
 function updateRecordsUI(){bestScoreEl.textContent=Number(localStorage.getItem(KEY_BEST_SCORE)||0);bestTimeEl.textContent=Number(localStorage.getItem(KEY_BEST_TIME)||0);bestPuzzleEl.textContent=Number(localStorage.getItem(KEY_BEST_PUZZLE)||0);}
 toggleSave.addEventListener('click',()=>{RECORDS_ENABLED=!RECORDS_ENABLED;toggleSave.textContent=RECORDS_ENABLED?'Salvar: ON':'Salvar: OFF';});
@@ -254,7 +256,7 @@ updateRecordsUI();
 function handleGameOver(){SPAWN_RATE=999999;showCenter('Game Over 😅',1500);setTimeout(()=>{setMode('challenge');},1100);}
 
 /* ===== LOOP ===== */
-let lastFrame=performance.now(),lastSpawn=performance.now();
+let lastFrame=performance.now();  /* não redeclare lastSpawn aqui! */
 function animate(now){
   const dt=now-lastFrame; lastFrame=now;
   if(!paused && now-lastSpawn>SPAWN_RATE){
@@ -279,19 +281,11 @@ function animate(now){
 requestAnimationFrame(animate);
 
 /* ===== MASCOTES VISUAIS ===== */
-function spawnSmallMascot(x,y){const m=['🦄','🧸','🐱','🐶','🐵','🐥','🐝','🐼'][Math.floor(Math.random()*8)];const el=document.createElement('div');el.className='floating-unlock';el.style.fontSize='40px';el.textContent=m;el.style.left=(x+(Math.random()-0.5)*40)+'px';el.style.top=y+'px';gameArea.appendChild(el);el.addEventListener('animationend',()=>el.remove());}
+function spawnSmallMascot(x,y){const m=MASCOT_EMOJIS[Math.floor(Math.random()*MASCOT_EMOJIS.length)];const el=document.createElement('div');el.className='floating-unlock';el.style.fontSize='40px';el.textContent=m;el.style.left=(x+(Math.random()-0.5)*40)+'px';el.style.top=y+'px';gameArea.appendChild(el);el.addEventListener('animationend',()=>el.remove());}
 
 /* ===== PUZZLE FUNCIONAL (tetris simplificado) ===== */
 const GCOL=10,GROW=18,CELL=22; let grid=[],cur=null,ptimer=null,pspeed=550,pscore=0,pgameOver=false;
-const SHAPES=[ // [matrix,color]
-  [[1,1,1,1]], // I
-  [[1,1],[1,1]], // O
-  [[0,1,0],[1,1,1]], // T
-  [[1,0,0],[1,1,1]], // J
-  [[0,0,1],[1,1,1]], // L
-  [[1,1,0],[0,1,1]], // S
-  [[0,1,1],[1,1,0]]  // Z
-];
+const SHAPES=[[[1,1,1,1]],[[1,1],[1,1]],[[0,1,0],[1,1,1]],[[1,0,0],[1,1,1]],[[0,0,1],[1,1,1]],[[1,1,0],[0,1,1]],[[0,1,1],[1,1,0]]];
 const COLORS=['#60a5fa','#fbbf24','#a78bfa','#22c55e','#fb7185','#38bdf8','#f59e0b'];
 function pInit(){grid=Array.from({length:GROW},()=>Array(GCOL).fill(0)); pscore=0; pgameOver=false; pspeed=550; newPiece(); drawGrid(); runLoop();}
 function openPuzzle(){pModal.style.display='block';pModal.setAttribute('aria-hidden','false');paused=true;pInit();}
@@ -303,13 +297,9 @@ function collide(dx,dy,mat){for(let y=0;y<mat.length;y++){for(let x=0;x<mat[0].l
 function merge(){for(let y=0;y<cur.m.length;y++){for(let x=0;x<cur.m[0].length;x++){if(cur.m[y][x] && cur.y+y>=0){grid[cur.y+y][cur.x+x]=cur.color;}}}}
 function clearLines(){let lines=0;for(let y=GROW-1;y>=0;y--){if(grid[y].every(v=>v)){grid.splice(y,1);grid.unshift(Array(GCOL).fill(0));lines++;y++;}} if(lines){pscore+=lines*10; if(RECORDS_ENABLED){const best=Number(localStorage.getItem('hb_best_puzzle')||0); if(pscore>best){localStorage.setItem('hb_best_puzzle',pscore); updateRecordsUI();}}}}
 function step(){ if(pgameOver) return; if(!collide(0,1,cur.m)){cur.y++;} else {merge(); clearLines(); newPiece();} drawGrid();}
-function drawGrid(){pctx.clearRect(0,0,pCanvas.width,pCanvas.height); // fundo e linhas
-  pctx.save(); pctx.translate(10,10);
-  // células fixas
+function drawGrid(){pctx.clearRect(0,0,pCanvas.width,pCanvas.height); pctx.save(); pctx.translate(10,10);
   for(let y=0;y<GROW;y++){for(let x=0;x<GCOL;x++){const v=grid[y][x]; if(v){pctx.fillStyle=v; pctx.fillRect(x*CELL,y*CELL,CELL-1,CELL-1);}}}
-  // peça atual
   if(cur){pctx.fillStyle=cur.color; for(let y=0;y<cur.m.length;y++){for(let x=0;x<cur.m[0].length;x++){if(cur.m[y][x] && cur.y+y>=0){pctx.fillRect((cur.x+x)*CELL,(cur.y+y)*CELL,CELL-1,CELL-1);}}}}
-  // moldura
   pctx.strokeStyle='rgba(0,0,0,.06)'; for(let x=0;x<=GCOL;x++){pctx.beginPath();pctx.moveTo(x*CELL,0);pctx.lineTo(x*CELL,GROW*CELL);pctx.stroke();}
   for(let y=0;y<=GROW;y++){pctx.beginPath();pctx.moveTo(0,y*CELL);pctx.lineTo(GCOL*CELL,y*CELL);pctx.stroke();}
   pctx.restore();
@@ -325,7 +315,6 @@ pDrop.addEventListener('click',()=>{if(!cur||pgameOver)return;while(!collide(0,1
 document.body.addEventListener('pointerdown',()=>{if(!audioCtx) initAudio(); if(audioCtx && audioCtx.state==='suspended') audioCtx.resume().catch(()=>{});},{once:true,passive:true});
 function prime(){resizeCanvas(); setMode('casual'); lastSpawn=performance.now(); for(let i=0;i<3;i++) setTimeout(()=>spawnBalloon(), i*250);}
 prime();
-
 </script>
 </body>
 </html>
